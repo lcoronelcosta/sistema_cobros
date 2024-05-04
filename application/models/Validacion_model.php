@@ -1416,7 +1416,28 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/
-		$result = $this->db->query("SELECT CC.id_cab_credito, CC.fecha_i, CI.nombre, CI.apellido, CC.mora, CC.totalapagar,CC.totalpagado,CC.estado, CC.d_mora, (SELECT round(sum(CC1.totalapagar - CC1.totalpagado),2) FROM cliente CI1, cab_credito CC1 WHERE CI1.id_cliente=CC1.id_cliente and CI1.id_usuario = CI.id_usuario and CC1.estado='pendiente') as t_saldo FROM cliente CI, cab_credito CC WHERE CI.id_cliente=CC.id_cliente and CI.id_usuario =". $id_usuario. " and estado!='eliminado' ORDER BY CC.estado DESC");
+		$result = $this->db->query("
+			SELECT CC.id_cab_credito, 
+			CC.fecha_i, 
+			CI.nombre, 
+			CI.apellido, 
+			CC.mora, 
+			CC.totalapagar,
+			CC.totalpagado,
+			CC.estado, 
+			CC.d_mora, 
+			(SELECT round(sum(CC1.totalapagar - CC1.totalpagado),2) 
+				FROM cliente CI1, cab_credito CC1 
+				WHERE CI1.id_cliente=CC1.id_cliente 
+				and CI1.id_usuario = CI.id_usuario 
+				and CC1.estado='pendiente') as t_saldo 
+			FROM cliente CI, cab_credito CC 
+			WHERE CI.id_cliente=CC.id_cliente 
+			and CI.id_usuario =". $id_usuario. "
+			and estado!='eliminado' 
+			AND (CC.totalapagar - CC.totalpagado) > 0
+			AND CC.estado = 'pendiente'
+			ORDER BY CC.estado DESC");
 
 		$arreglo = null;		
 		foreach ($result->result_array() as $row) {
