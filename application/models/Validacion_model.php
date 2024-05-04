@@ -392,7 +392,30 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/
-		$result = $this->db->query("SELECT min(DC.id_det_credito) AS id_det_credito, CI.nombre, CI.apellido, round(DC.v_cuota,2) as v_cuota, round(DC.abono,2) as abono, CC.fecha_i, CC.d_mora, CC.mora, CC.totalapagar,CC.totalpagado,(SELECT round(sum(CC1.totalapagar - CC1.totalpagado),2) FROM cliente CI1, cab_credito CC1 WHERE CI1.id_cliente=CC1.id_cliente and CI1.id_usuario = CI.id_usuario and CC1.estado='pendiente') as t_cuota FROM cliente CI, cab_credito CC, det_credito DC WHERE CI.id_cliente=CC.id_cliente and CC.id_cab_credito=DC.id_cab_credito and CI.id_usuario =". $id_usuario. " and DC.estado='pendiente' GROUP BY DC.id_cab_credito");
+		$result = $this->db->query("
+			SELECT min(DC.id_det_credito) AS id_det_credito, 
+				CI.nombre, 
+				CI.apellido, 
+				round(DC.v_cuota,2) as v_cuota, 
+				round(DC.abono,2) as abono, 
+				CC.fecha_i, 
+				CC.d_mora, 
+				CC.mora, 
+				CC.totalapagar,
+				CC.totalpagado,
+					(SELECT round(sum(CC1.totalapagar - CC1.totalpagado),2) 
+						FROM cliente CI1, cab_credito CC1 
+						WHERE CI1.id_cliente=CC1.id_cliente 
+							and CI1.id_usuario = CI.id_usuario 
+							and CC1.estado='pendiente') as t_cuota 
+					FROM cliente CI, cab_credito CC, det_credito DC 
+					WHERE CI.id_cliente=CC.id_cliente 
+						and CC.id_cab_credito=DC.id_cab_credito 
+						and CI.id_usuario =". $id_usuario. " 
+						and DC.estado='pendiente' 
+						AND (CC.totalapagar - CC.totalpagado) > 0
+						GROUP BY DC.id_cab_credito"
+		);
 
 		$arreglo = null;		
 		foreach ($result->result_array() as $row) {
