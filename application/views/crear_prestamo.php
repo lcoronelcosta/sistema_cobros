@@ -19,9 +19,14 @@ date_default_timezone_set('America/Bogota');
 	<!-- Select2 -->
 	<link href="<?php echo base_url(); ?>css/select2.css" rel="stylesheet"/>
     <script src="<?php echo base_url(); ?>js/select2.min.js" defer></script>
-	
-
 	<!-- Select2 -->
+
+	<!-- CDN Sweet alert-->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<!-- Toast -->
+	<link href="<?php echo base_url(); ?>css/toastify.min.css" rel="stylesheet"/>
+    <script src="<?php echo base_url(); ?>js/toastify.min.js" defer></script>
 
     <style type="text/css">
     	#cabecera { height: 200px; }
@@ -107,8 +112,9 @@ date_default_timezone_set('America/Bogota');
 	        $("#fecha_f").val(moment(new Date()).format('YYYY-MM-DD'));
 	        $("#tabla_amortizacion_tmp tr").remove();
 	        document.getElementById("cabecera").style.display='none';
-	        //document.getElementById("btn_calcular").style.display='none';
+	        document.getElementById("btn_calcular").style.display='block';
 		    document.getElementById("btn_guardar").style.display='none';
+			$("#btn_compartir").prop("disabled", true);
 		    document.getElementById("seleccionar").selected = true;  
 	    }
 
@@ -581,6 +587,8 @@ date_default_timezone_set('America/Bogota');
 	    {
 	    				
 			var d ='';
+			var data_whatsapp = '%0A'+'*DETALLE*'+'%0A';
+			$("#data_whatsapp").val('');
 			for (var i = 0; i < datos.length; i++) {
 				 //Cambio el formato de fecha dd-mm-yyyy
 				 fecha_conc = datos[i].fecha.substring(8,10) + datos[i].fecha.substring(4,8) + datos[i].fecha.substring(0,4);
@@ -590,15 +598,20 @@ date_default_timezone_set('America/Bogota');
 				 '<td width="30%" style="text-align:center;">$ '+datos[i].valor+'</td>'+
 				 '</tr>';
 
+				 data_whatsapp += '*Pago'+datos[i].cuota+'*'+'%0A' +
+				 '*Fecha*:' + fecha_conc +'%0A' +
+				 '*Valor*: $' + datos[i].valor +'%0A';
+
 				 //Actualizo la fecha final con la ultima cuota
 				 if (i == datos.length - 1)
 				 {
 				 	$('#fecha_f').val(datos[i].fecha);
-				 }
+				 } 
 			 }
 
 			$("#tabla_amortizacion_tmp").append(d);
 			document.getElementById("cabecera").style.display='block';
+			$("#data_whatsapp_detalle").val(data_whatsapp);
 
 	    }
 
@@ -614,9 +627,18 @@ date_default_timezone_set('America/Bogota');
 
 	    function calcular_totalapagar ($valor_t, $tasa_t, $plazo_t)
 	    {
+			$('#data_whatsapp_cabecera').val('');
+			($("#valor").val(),$("#tasa").val(),$("#plazo").val())
 	    	$totalapagar_t = parseInt($valor_t) + parseInt($valor_t * $tasa_t/100)
 	    	$('#totalapagar').val($totalapagar_t);
 	    	$('#interes').val(parseInt($valor_t * $tasa_t/100));
+			 var data_whatsapp_cabecera = 
+				'*Credito*: $' + $("#valor").val() + '%0A' +
+				'*Tipo Pago*: ' + $("#formadepago").val() + '%0A' + 
+				'*Tasa interes*: ' + $("#tasa").val() + '%' + '%0A' +
+				'*Interes*: $' + $("#interes").val() + '%0A' +
+				'*Total Pagar*: $' + $totalapagar_t;
+			$('#data_whatsapp_cabecera').val(data_whatsapp_cabecera);
 	    }
 		
 
@@ -674,9 +696,15 @@ date_default_timezone_set('America/Bogota');
 	    		async:false,
 				success:function(result)
 				{
-					//$("#mens").html(result);
-					alert("Credito ingresado correctamente.");
-					limpiar();
+					Swal.fire({
+						title: "Excelente!",
+						text: "Credito guardado correctamente!",
+						icon: "success",
+					});
+					$("#btn_compartir").prop("disabled", false);
+					document.getElementById("btn_guardar").style.display='none';
+					document.getElementById("btn_calcular").style.display='none';
+					//limpiar();
 				},
 				error:function(xhr, status, error)
 				{
@@ -686,6 +714,56 @@ date_default_timezone_set('America/Bogota');
 				}					
 			});				
 		}
+
+		/**Obtener numero de celular */
+		function obtenerCelular(el){ // recibimos por parametro el elemento select
+			var celular = $('option:selected', el).attr('atr_celular');
+			var mensaje = (celular != "") 
+				? 'Perfecto!. Cliente si tiene celular registrado' 
+				: 'Error!. Cliente no tiene celular registrado';
+			var background = (celular != "") ? '#06AC0E' : '#CC2906';
+			Toastify({
+				text: mensaje,
+				duration: 3000,
+				newWindow: true,
+				close: true,
+				gravity: "top", // `top` or `bottom`
+				position: "right", // `left`, `center` or `right`
+				stopOnFocus: true, // Prevents dismissing of toast on hover
+				style: {
+					background: background,
+				}
+			}).showToast();
+		}
+
+		/**Funcion compartir el detalle de saldos por wahatsapp */
+		function compartir(){
+			var celular = $( "#cliente option:selected" ).attr('atr_celular');
+			if(celular == ""){
+				Toastify({
+					text: 'Error!. Cliente no tiene celular registrado',
+					duration: 3000,
+					newWindow: true,
+					close: true,
+					gravity: "top", // `top` or `bottom`
+					position: "right", // `left`, `center` or `right`
+					stopOnFocus: true, // Prevents dismissing of toast on hover
+					style: {
+						background: '#CC2906',
+					}
+				}).showToast();
+			}else{
+				if(celular.length == 10){
+					celular = '593'+celular.substring(1);
+				}
+				var cabecera = $("#data_whatsapp_cabecera").val();
+				var detalle = $("#data_whatsapp_detalle").val();
+				let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text='+cabecera+detalle;
+				window.open(url, '_blank');
+				//location.href = url;
+			}
+		}
+
 	</script>
 
 </head>
@@ -703,12 +781,12 @@ date_default_timezone_set('America/Bogota');
 						<tr>
 							<td>Cliente: </td> 
 							<td>
-								<select class="select2" name="cliente" id="cliente" style="width: 100%;">
-								<?php 
+								<select class="select2" name="cliente" id="cliente" style="width: 100%;" onchange="obtenerCelular(this);">
+								<?php
 									foreach($clientes as $fila)
 										 {
 										 ?>
-										 <option id="<?=$fila->id_cliente?>" value="<?=$fila->id_cliente?>"><?=$fila->nombre?> <?=$fila->apellido?></option>
+										 <option atr_celular="<?=$fila->celular?>" id="<?=$fila->id_cliente?>" value="<?=$fila->id_cliente?>"><?=$fila->nombre?> <?=$fila->apellido?></option>
 										 <?php
 										 }
 										?> 
@@ -806,12 +884,18 @@ date_default_timezone_set('America/Bogota');
 									<td><input type="submit" id="btn_regresar" name="btn_regresar"class="btn-sm" style="width: 100%;background-color: #C8216A;color: #FFFFFF;" value="Regresar" onclick="regresar()"/></td>
 								</form>
      						</tr>
+							<tr style="height: 15px"></tr>
+							<tr>
+								<td><input type="submit" id="btn_compartir" name="btn_guardar"class="btn btn-success btn-sm" disabled style="width: 100%; margin-left:50%" value="Compartir" onclick="compartir()"/></td>
+							</tr>
 					</table>
                 </div>
 			</div>
 			
 		</div>
 	</div>
+	<input type="hidden" name="data_whatsapp_cabecera" id="data_whatsapp_cabecera" value="">
+	<input type="hidden" name="data_whatsapp_detalle" id="data_whatsapp_detalle" value="">
 
 <script src="<?php echo base_url(); ?>tether/js/tether.min.js"></script>
 <script src="<?php echo base_url(); ?>js/jquery.js"></script>

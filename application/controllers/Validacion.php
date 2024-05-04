@@ -116,7 +116,7 @@ class Validacion extends CI_Controller {
 	        if($this->upload->do_upload('user_file'))
 	        {
 	        	//*********************************************************************************
-				//Realiza la inserción de la solicitud al Model con el nombre del archivos adjunto
+				//Realiza la inserciï¿½n de la solicitud al Model con el nombre del archivos adjunto
 				//*********************************************************************************
 	        	$data_file = $this->upload->data();        	
 	        	$query = $this->validacion_model->insertar_solicitud($data_file['file_name']);
@@ -124,14 +124,14 @@ class Validacion extends CI_Controller {
 	        }
 	        else
 	        {        		        	
-	        	alert("Existe un problema con el archivo. Intente más tarde.");
+	        	alert("Existe un problema con el archivo. Intente mï¿½s tarde.");
 	        	return 0;	        		       
 	        }
 	    }
 	    else
 	    {
 	    	//********************************************************************
-			//Realiza la inserción de la solicitud al Model sin archivos adjuntos
+			//Realiza la inserciï¿½n de la solicitud al Model sin archivos adjuntos
 			//********************************************************************
 	    	$query = $this->validacion_model->insertar_solicitud("");	    		    	
 	    }
@@ -143,7 +143,7 @@ class Validacion extends CI_Controller {
 		//$this->load->view('welcome_message');
 		$this->load->model('validacion_model');
 		//***********************************************
-		//Realiza la eliminación de la solicitud al Model 
+		//Realiza la eliminaciï¿½n de la solicitud al Model 
 		//***********************************************
 		$query = $this->validacion_model->eliminar_solicitud();
 		
@@ -182,21 +182,21 @@ class Validacion extends CI_Controller {
 				}
 				
 				//********************************************************************
-				//Realiza la actualización de la solicitud al Model sin archivos adjuntos
+				//Realiza la actualizaciï¿½n de la solicitud al Model sin archivos adjuntos
 				//********************************************************************
 				$data_file = $this->upload->data();        	
 	        	$query = $this->validacion_model->actualizar_solicitud($data_file['file_name']);
 	        }	        
 	        else
 	        {        		        	
-	        	alert("Existe un problema con el archivo. Intente más tarde.");
+	        	alert("Existe un problema con el archivo. Intente mï¿½s tarde.");
 	        	return 0;	        		       
 	        }
         }
         else
 	    {
 	    	//******************************************************
-	    	//Se verifica si el usuario eliminó el archivo adjunto
+	    	//Se verifica si el usuario eliminï¿½ el archivo adjunto
 	    	//******************************************************
 	    	$var = $this->input->post('elimino_archivo');
 	    	if ($var == 1)
@@ -211,7 +211,7 @@ class Validacion extends CI_Controller {
 				}
 
 		    	//********************************************************************
-				//Realiza la actualización de la solicitud al Model sin archivos adjuntos
+				//Realiza la actualizaciï¿½n de la solicitud al Model sin archivos adjuntos
 				//********************************************************************
 
 				$query = $this->validacion_model->actualizar_solicitud("");	
@@ -219,7 +219,7 @@ class Validacion extends CI_Controller {
 	    	else
 	    	{
    		    	//********************************************************************
-				//Realiza la actualización de la solicitud al Model sin archivos adjuntos
+				//Realiza la actualizaciï¿½n de la solicitud al Model sin archivos adjuntos
 				//********************************************************************
 
 	    		$query = $this->validacion_model->actualizar_solicitud("no_eliminar");	
@@ -228,7 +228,7 @@ class Validacion extends CI_Controller {
 	    	    		    	
 	    }
 		//***********************************************
-		//Realiza la inserción de la solicitud al Model 
+		//Realiza la inserciï¿½n de la solicitud al Model 
 		//***********************************************
 		//$query = $this->validacion_model->actualizar_solicitud();
 		
@@ -262,7 +262,7 @@ class Validacion extends CI_Controller {
 	        if($this->upload->do_upload('user_file'))
 	        {
 	        	//*********************************************************************************
-				//Realiza la inserción de la solicitud al Model con el nombre del archivos adjunto
+				//Realiza la inserciï¿½n de la solicitud al Model con el nombre del archivos adjunto
 				//*********************************************************************************
 	        	$data_file = $this->upload->data();        	
 	        	$query = $this->validacion_model->insertar_solicitud($data_file['file_name']);
@@ -270,14 +270,14 @@ class Validacion extends CI_Controller {
 	        }
 	        else
 	        {        		        	
-	        	alert("Existe un problema con el archivo. Intente más tarde.");
+	        	alert("Existe un problema con el archivo. Intente mï¿½s tarde.");
 	        	return 0;	        		       
 	        }
 	    }
 	    else
 	    {
 	    	//********************************************************************
-			//Realiza la inserción de la solicitud al Model sin archivos adjuntos
+			//Realiza la inserciï¿½n de la solicitud al Model sin archivos adjuntos
 			//********************************************************************
 	    	$query = $this->validacion_model->insertar_solicitud("");	    		    	
 	    }*/
@@ -286,7 +286,7 @@ class Validacion extends CI_Controller {
 
 	public function login()
 	{
-		if (isset($_POST['password'])) //Verifica que no se haya ubicado la pagína directamente, sin pasar por el login
+		if (isset($_POST['password'])) //Verifica que no se haya ubicado la pagï¿½na directamente, sin pasar por el login
 		{
 			$this->load->model('validacion_model');
 			
@@ -307,7 +307,7 @@ class Validacion extends CI_Controller {
 		}
 		else
 		{			
-			redirect(base_url()); // en caso que presionen el boton sin ingresar los datos, simplemente se recarga la página
+			redirect(base_url()); // en caso que presionen el boton sin ingresar los datos, simplemente se recarga la pï¿½gina
 		}	
 	}
 
@@ -388,7 +388,8 @@ class Validacion extends CI_Controller {
 		$array_tmp = $this->session->userdata('usuario_data');	
 		$this->load->model('validacion_model');
 		$data['clientes'] =$this->validacion_model->consulta_clientes($array_tmp['id_usuario']);
-		$this->session->set_userdata('listado_cliente',$data);	
+		$this->session->set_userdata('listado_cliente',$data);
+
 		redirect(base_url().'index.php/menu_principal/crear_prestamo');
 	}
 
@@ -518,7 +519,7 @@ class Validacion extends CI_Controller {
 	        if($this->upload->do_upload('user_file'))
 	        {
 	        	//*********************************************************************************
-				//Realiza la inserción de la solicitud al Model con el nombre del archivos adjunto
+				//Realiza la inserciï¿½n de la solicitud al Model con el nombre del archivos adjunto
 				//*********************************************************************************
 	        	$data_file = $this->upload->data();        	
 	        	$query = $this->validacion_model->insertar_cliente($data_file['file_name']);
@@ -526,7 +527,7 @@ class Validacion extends CI_Controller {
 	        }
 	        else
 	        {        		        	
-	        	//alert("Existe un problema con el archivo. Intente más tarde.");
+	        	//alert("Existe un problema con el archivo. Intente mï¿½s tarde.");
 	        	echo "0";	        		       
 	        }
 	    }
@@ -565,7 +566,7 @@ class Validacion extends CI_Controller {
 	        if($this->upload->do_upload('user_file'))
 	        {
 	        	//*********************************************************************************
-				//Realiza la inserción de la solicitud al Model con el nombre del archivos adjunto
+				//Realiza la inserciï¿½n de la solicitud al Model con el nombre del archivos adjunto
 				//*********************************************************************************
 	        	$data_file = $this->upload->data();        	
 	        	$query = $this->validacion_model->insertar_cobrador($data_file['file_name']);
@@ -573,7 +574,7 @@ class Validacion extends CI_Controller {
 	        }
 	        else
 	        {        		        	
-	        	//alert("Existe un problema con el archivo. Intente más tarde.");
+	        	//alert("Existe un problema con el archivo. Intente mï¿½s tarde.");
 	        	echo "0";		        		       
 	        }
 	    }
@@ -630,7 +631,7 @@ class Validacion extends CI_Controller {
 		$this->load->model('validacion_model');
 
 		//***********************************
-		//Guardar crédito
+		//Guardar crï¿½dito
 		//***********************************		 	
 		$query = $this->validacion_model->insertar_credito();	    		    	
 	    		
@@ -921,7 +922,7 @@ class Validacion extends CI_Controller {
 		$this->validacion_model->consulta_allclientes(); 
 	}
 
-	//Devuelvo la información del cliente 
+	//Devuelvo la informaciï¿½n del cliente 
 	public function editar_cliente()
 	{
 		$this->load->model('validacion_model');
@@ -959,7 +960,7 @@ class Validacion extends CI_Controller {
 	        if($this->upload->do_upload('user_file'))
 	        {
 	        	//*********************************************************************************
-				//Realiza la inserción de la solicitud al Model con el nombre del archivos adjunto
+				//Realiza la inserciï¿½n de la solicitud al Model con el nombre del archivos adjunto
 				//*********************************************************************************
 	        	$data_file = $this->upload->data();        	
 	        	$query = $this->validacion_model->actualizar_cliente($data_file['file_name']);
@@ -967,7 +968,7 @@ class Validacion extends CI_Controller {
 	        }
 	        else
 	        {        		        	
-	        	//alert("Existe un problema con el archivo. Intente más tarde.");
+	        	//alert("Existe un problema con el archivo. Intente mï¿½s tarde.");
 	        	echo "0";	        		       
 	        }
 	    }
@@ -1026,7 +1027,7 @@ class Validacion extends CI_Controller {
 	        if($this->upload->do_upload('user_file'))
 	        {
 	        	//*********************************************************************************
-				//Realiza la inserción de la solicitud al Model con el nombre del archivos adjunto
+				//Realiza la inserciï¿½n de la solicitud al Model con el nombre del archivos adjunto
 				//*********************************************************************************
 	        	$data_file = $this->upload->data();        	
 	        	$query = $this->validacion_model->actualizar_cobrador($data_file['file_name']);
@@ -1034,7 +1035,7 @@ class Validacion extends CI_Controller {
 	        }
 	        else
 	        {        		        	
-	        	//alert("Existe un problema con el archivo. Intente más tarde.");
+	        	//alert("Existe un problema con el archivo. Intente mï¿½s tarde.");
 	        	echo "0";	        		       
 	        }
 	    }
