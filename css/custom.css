@@ -1,0 +1,305 @@
+strong { 
+	font-weight: 500; 
+}
+a, a:hover, a:focus {
+	text-decoration: none;
+}
+h1, h2 {
+	margin-top: 10px;
+	font-size: 38px;
+    font-weight: 100;
+    line-height: 50px;
+}
+
+h3 {
+	font-size: 25px;
+    font-weight: 300;
+}
+
+.subir{
+    padding: 5px 10px;
+    background: #2E86C1;
+    color:#fff;
+    border:0px solid #fff;
+}
+ 
+.subir:hover{
+    color:#fff;
+    background: #f7cb15;
+}
+
+#mostrar_imagen img {
+    max-width: 100%;
+}
+
+/* Contenidos y Formulario*/
+.body_alterno{
+    font-family: 'Raleway';
+    font-size: 14px;
+    font-weight: 300;
+    color: #fff;
+    line-height: 30px;
+    text-align: left;
+    background-color: #BDC3C7;
+}
+
+.body_alterno1{
+    /*font-family: 'Raleway';
+    font-size: 14px;
+    font-weight: 300;
+    
+    line-height: 30px;
+    text-align: center;*/
+    color: #000;
+    background-color: #BDC3C7;
+}
+
+.body_pantalla{
+    font-family: 'Raleway';
+    font-size: 12px;
+    font-weight: 300;
+    color: #fff;
+    line-height: 30px;
+    text-align: left;
+    background-color: #D8D8D8;
+}
+
+.my-content {
+    padding: 100px 0 170px 0;
+}
+.my-content .mydescription {
+    margin: 20px 0 10px 0;
+}
+.my-content .mydescription p { 
+    opacity: 0.8; 
+}
+.myform-cont {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.myform-top {
+    overflow: hidden;
+    padding: 0 25px 0px 25px;
+    background-color: #2E86C1;
+    /*background: rgba(0, 0, 0, 1);*/
+    -moz-border-radius: 10px 10px 0 0; 
+    -webkit-border-radius: 10px 10px 0 0; 
+    border-radius: 10px 10px 0 0;
+    
+}
+
+.myform-topmenu-left { 
+    float: left;
+    width: 50%;
+    padding-top: 15px;
+    text-align: center;
+}
+
+.myform-topmenu-right {
+    float: right;
+    width: 50%;
+    padding-top: 15px;
+    text-align: center;
+}
+
+.myform-top-left { 
+    float: left;
+    width: 75%;
+    padding-top: 25px;
+    text-align: left;
+}
+.my-center { 
+    float: left;    
+    width: 100%;   
+     
+}
+.myform-top-left p { 
+    opacity: 0.8; 
+}
+.myform-top-right {
+    float: right;
+    width: 25%;
+    padding-top: 25px;
+    font-size: 66px;
+    text-align: right;
+    opacity: 0.3;
+}
+.myform-top-usuario-left { 
+    float: left;
+    width: 25%;
+    padding-top: 25px;    
+    text-align: left;    
+}
+.myform-top-usuario-right
+{    
+    float: right;
+    width: 75%;
+    padding-top: 25px;    
+    text-align: left;    
+}
+.myform-principal{
+    margin-top: 25px;    
+    background-color: #FFFFFF;
+    font-family: 'Raleway';
+    font-size: 12px;
+    /*font-weight: 300;*/
+    color: #000;
+    text-align: left;
+    
+}
+.myform-bottom {
+    padding: 15px 10px 35px 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    -moz-border-radius: 0 0 10px 10px; 
+    -webkit-border-radius: 0 0 10px 10px; 
+    border-radius: 0 0 10px 10px;
+    
+}
+.myform-bottom2 {
+    /*arriba derecha abajo izquierda */
+    padding: 10px 10px 10px 2px;
+    background-color: #FFFFFF;
+    color: #000000;
+    -moz-border-radius: 0 0 10px 10px; 
+    -webkit-border-radius: 0 0 10px 10px; 
+    border-radius: 0 0 10px 10px;
+    
+}
+
+.myform-bottom-principal {
+    padding: 25px 25px 100% 25px;
+    background-color: #F7F9F9;
+    -moz-border-radius: 0 0 10px 10px; 
+    -webkit-border-radius: 0 0 10px 10px; 
+    border-radius: 0 0 10px 10px;
+    
+}
+
+.myform-bottom-principal .mybtn {
+    width: 100%;
+}
+
+.myform-bottom-principal .option {
+    width: 100%;
+}
+
+.myform-bottom .mybtn {
+    width: 100%;
+}
+
+.myform-bottom .option {
+    width: 100%;
+}
+
+input[type="text"], 
+input[type="password"], 
+textarea, 
+textarea.form-control {
+    height: 50px;
+    vertical-align: middle;
+    background: #fff;
+    border: 3px solid #fff;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 50px;
+    
+}
+
+input[type="text"]:focus, 
+input[type="password"]:focus, 
+textarea:focus, 
+textarea.form-control:focus {
+    background: #fff;
+    border: 2px solid #1AAE88;
+}
+
+button.option {
+    height: 50px;
+    background: #1F618D;
+    /*background: rgba(0, 0, 0, 0.2);  */
+    /*border-color:rgba(0, 0, 0, 0.35);*/
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #fff;
+    /*-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;*/
+    
+}
+button.option:hover, button.option:active { 
+    /*opacity: 0.6;*/
+    background: #C8216A; 
+    color: #fff; 
+}
+button.option:focus { 
+    opacity: 0.7;  
+    color: #fff; 
+    background: #C8216A; 
+}
+button.mybtn {
+    height: 50px;
+    background: #C8216A;
+    border: 0;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 40px;
+    color: #fff;
+    -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;
+    
+}
+button.mybtn:hover, button.mybtn:active { 
+    opacity: 0.6; 
+    color: #fff; 
+}
+button.mybtn:focus { 
+    opacity: 0.6;  
+    color: #fff; 
+    background: #de615e; 
+}
+
+/*LOGIN REDES SOCIALES*/
+
+.mysocial-login {
+    margin-top: 35px;
+}
+.mysocial-login-buttons {
+    margin-top: 25px;
+}
+.mybtn-social {
+    display: inline-block;
+    height: 50px;
+    margin: 5px;
+    padding: 15px 20px 0 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #fff;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 16px;
+    color: #fff;
+    -moz-border-radius: 4px; 
+    -webkit-border-radius: 4px; 
+    border-radius: 4px;
+}
+.mybtn-social:hover, .mybtn-social:focus, .mybtn-social:active:focus { 
+    outline: 0;
+    opacity: 0.6; 
+    background: rgba(0, 0, 0, 0.3); 
+    color: #fff; 
+}
+
+/* Media queries */
+@media (min-width: 992px) and (max-width: 1199px) {}
+
+@media (min-width: 768px) and (max-width: 991px) {}
+
+@media (max-width: 767px) {
+    
+    .mytop-content { padding: 60px 0 110px 0; }
+
+}
+
+@media (max-width: 415px) {
+    
+    h1, h2 { font-size: 32px; }
+
+}
