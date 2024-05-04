@@ -962,7 +962,6 @@ class Validacion_model extends CI_Model {
 
 	public function consulta_clientes($id_usuario)
 	{
-		$this->db->set_charset("utf8mb4");
 		$query = $this->db->query("SELECT c.id_cliente, c.nombre, c.apellido FROM cliente c, usuario u WHERE u.id_usuario=c.id_usuario and u.id_usuario= " . $id_usuario . " order by c.nombre");	
 		return $query->result();
 	}
