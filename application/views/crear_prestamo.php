@@ -587,7 +587,7 @@ date_default_timezone_set('America/Bogota');
 	    {
 	    				
 			var d ='';
-			var data_whatsapp = '%0A'+'*DETALLE*'+'%0A';
+			var data_whatsapp = '*DETALLE*'+'%0A';
 			$("#data_whatsapp").val('');
 			for (var i = 0; i < datos.length; i++) {
 				 //Cambio el formato de fecha dd-mm-yyyy
@@ -758,7 +758,7 @@ date_default_timezone_set('America/Bogota');
 				}
 				var cabecera = $("#data_whatsapp_cabecera").val();
 				var detalle = $("#data_whatsapp_detalle").val();
-				let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text='+cabecera+detalle;
+				let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text='+detalle;
 				window.open(url, '_blank');
 				//location.href = url;
 			}
