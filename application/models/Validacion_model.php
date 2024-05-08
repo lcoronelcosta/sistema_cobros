@@ -1742,8 +1742,10 @@ class Validacion_model extends CI_Model {
 		$detalleString = "*DETALLE*".'%0A';
 		$num_celular = isset($result->result_array()[0]['celular']) ? $result->result_array()[0]['celular'] : '';
 		$diasMora = isset($result->result_array()[0]['d_mora']) ? $result->result_array()[0]['d_mora'] : '';
+		$saldoTotal = 0;
 		foreach ($result->result_array() as $row) {
 			$saldo = $row['v_cuota']-$row['abono'];
+			$saldoTotal = $saldo+$saldoTotal;
 			if($row['n_cuota'] == 0){
 				$detalleString = $detalleString.'*Mora*'.'%0A';
 				$detalleString = $detalleString.'- Días: '.$diasMora.'%0A';
@@ -1755,6 +1757,7 @@ class Validacion_model extends CI_Model {
 			$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
 			$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
 		}
+		$detalleString = $detalleString.'%0A'.'*Total adeudado: $'.$saldoTotal.'*';
 		$resultData = array(
 			'success' => true,
 			'data' => $detalleString,

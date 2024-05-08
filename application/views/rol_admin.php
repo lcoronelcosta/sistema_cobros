@@ -25,6 +25,8 @@ date_default_timezone_set('America/Bogota');?>
 	<link href="<?php echo base_url(); ?>css/toastify.min.css" rel="stylesheet"/>
     <script src="<?php echo base_url(); ?>js/toastify.min.js" defer></script>
 
+	<link href="<?php echo base_url(); ?>css/popper.css" rel="stylesheet"/>
+
 </head>	
 <body  class="body_alterno">
 	<div class="container formulario">
@@ -162,6 +164,7 @@ date_default_timezone_set('America/Bogota');?>
 								<th>Saldo</th>
 								<th>Id</th>
 								<th>Opción</th>
+								<th></th>
 							</tr>
 						</thead>
 					</table>
@@ -457,17 +460,6 @@ date_default_timezone_set('America/Bogota');?>
 								return (`
 								<div>
 									<button type='button' class='form btn-primary'> Reprogramar</button> 
-									<br/>
-									<button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito("${row["id_det_credito"]}")'> 
-										<div style='text-align:center; color:green;'>
-											<i class='fa fa-share-alt'></i>
-										</div>
-									</button> 
-									<a href='tel:${row["celular"]}' class='btn btn-lg' style='background-color:transparent;'> 
-										<div style='text-align:center; color:blue;'>
-											<i class='fa fa-phone'></i>
-										</div>
-									</a>
 									<button class='btn btn-lg' style='background-color:transparent;' onclick='acuerdoDePago("${row["celular"]}")'> 
 										<div style='text-align:center; color:green;'>
 											<i class='fa fa-whatsapp'></i>
@@ -476,6 +468,34 @@ date_default_timezone_set('America/Bogota');?>
 								</div>`);
 							}
 						},
+						{"render":
+						  	function ( data, type, row ) {
+						  		//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
+								return (`
+								<details class="dropdown">
+									<summary role="button">
+										<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+									</summary>
+									<ul >
+										<li style="font-size:12px; margin-left: 10px" onclick='compartirDetalleCredito("${row["id_det_credito"]}")'>
+											<span>
+												<a style='color:green;'>
+													<i class='fa fa-share-alt'>&emsp;Compartir</i>
+												</a>
+											<span/>
+										</li>
+										<li style="font-size:12px">
+											<span>
+												<a href='tel:${row["celular"]}' style='color:blue;'>
+													<i class='fa fa-phone'>&emsp;Llamar</i>
+												</a>
+											<span/>
+										</li>
+									</ul>
+								</details>
+								`);
+							}
+						}
 						
 					],
 					//select: true,					
