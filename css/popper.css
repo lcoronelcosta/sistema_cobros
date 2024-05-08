@@ -4,7 +4,7 @@
 :root {
   --button-background: rgb(251, 252, 253);
   --button-color: rgb(81, 81, 81);
-  --dropdown-highlight: rgb(49, 123, 197);
+  --dropdown-highlight: rgba(255, 255, 255, 0);
   --dropdown-width: 200px;
   --dropdown-background: white;
   --dropdown-color: black;
