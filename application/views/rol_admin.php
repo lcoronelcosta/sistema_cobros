@@ -24,7 +24,7 @@ date_default_timezone_set('America/Bogota');?>
 	<!-- Toast -->
 	<link href="<?php echo base_url(); ?>css/toastify.min.css" rel="stylesheet"/>
     <script src="<?php echo base_url(); ?>js/toastify.min.js" defer></script>
-	
+
 </head>	
 <body  class="body_alterno">
 	<div class="container formulario">
@@ -318,6 +318,30 @@ date_default_timezone_set('America/Bogota');?>
 		 function(data,status){  });
 	}
 
+	function acuerdoDePago(celular){
+		if(celular == ""){
+			Toastify({
+				text: 'Error!. Cliente no tiene celular registrado',
+				duration: 3000,
+				newWindow: true,
+				close: true,
+				gravity: "top", // `top` or `bottom`
+				position: "right", // `left`, `center` or `right`
+				stopOnFocus: true, // Prevents dismissing of toast on hover
+				style: {
+					background: '#CC2906',
+				}
+			}).showToast();
+		}else{
+			if(celular.length == 10){
+				celular = '593'+celular.substring(1);
+			}
+			let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text=*Hola*, hoy le toca su pago';
+			//window.open(url, '_blank');
+			location.href = url;
+		}
+	}
+
 	function compartirDetalleCredito(id_det_credito){
 		$.post("<?= base_url() .'index.php/validacion/compartirDetalleCredito'?>",
 		{
@@ -430,7 +454,26 @@ date_default_timezone_set('America/Bogota');?>
 						{"render":
 						  	function ( data, type, row ) {
 						  		//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
-								return ("<div><button type='button' class='form btn-primary'> Reprogramar</button> <button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito("+row["id_det_credito"]+")'> <div style='text-align:center; color:green;'><i class='fa fa-share-alt'></i></div></button> <a href='tel:"+row["celular"]+"' class='btn btn-lg' style='background-color:transparent;'> <div style='text-align:center; color:blue;'><i class='fa fa-phone'></i></div></a></div>")
+								return (`
+								<div>
+									<button type='button' class='form btn-primary'> Reprogramar</button> 
+									<br/>
+									<button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito("${row["id_det_credito"]}")'> 
+										<div style='text-align:center; color:green;'>
+											<i class='fa fa-share-alt'></i>
+										</div>
+									</button> 
+									<a href='tel:${row["celular"]}' class='btn btn-lg' style='background-color:transparent;'> 
+										<div style='text-align:center; color:blue;'>
+											<i class='fa fa-phone'></i>
+										</div>
+									</a>
+									<button class='btn btn-lg' style='background-color:transparent;' onclick='acuerdoDePago("${row["celular"]}")'> 
+										<div style='text-align:center; color:green;'>
+											<i class='fa fa-whatsapp'></i>
+										</div>
+									</button>
+								</div>`);
 							}
 						},
 						
