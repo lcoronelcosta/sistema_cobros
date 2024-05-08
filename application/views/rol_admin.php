@@ -389,7 +389,7 @@ date_default_timezone_set('America/Bogota');?>
 					"rowId": 'id_det_credito',
         			"select": true,
         			'deferRender': true,
-					"scrollY": "250px",
+					"scrollY": "330px",
         			"scrollCollapse": true,
         			'scroller': true,
         			"animate": true,
@@ -459,7 +459,12 @@ date_default_timezone_set('America/Bogota');?>
 						  		//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
 								return (`
 								<div>
-									<button type='button' class='form btn-primary'> Reprogramar</button> 
+									<!--<button type='button' class='form btn-primary'> Reprogramar</button>-->
+									<button class='form btn btn-lg' style='background-color:transparent;'> 
+										<div style='text-align:center; color:black;'>
+											<i class="fa fa-registered" aria-hidden="true"></i>
+										</div>
+									</button>
 									<button class='btn btn-lg' style='background-color:transparent;' onclick='acuerdoDePago("${row["celular"]}")'> 
 										<div style='text-align:center; color:green;'>
 											<i class='fa fa-whatsapp'></i>
