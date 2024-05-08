@@ -336,7 +336,7 @@ date_default_timezone_set('America/Bogota');?>
 			if(celular.length == 10){
 				celular = '593'+celular.substring(1);
 			}
-			let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text=*Hola*, hoy le toca su pago';
+			let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text=*Hola,* hoy le toca su pago';
 			//window.open(url, '_blank');
 			location.href = url;
 		}
