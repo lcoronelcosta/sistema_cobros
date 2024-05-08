@@ -1246,4 +1246,15 @@ class Validacion extends CI_Controller {
 		$this->validacion_model->historial_cliente_pendientes($_POST['id_cliente']);
 	}
 
+	/**Compartir detalle del credito */
+	public function compartirDetalleCredito()
+	{
+		$this->load->model('validacion_model');
+		$result =$this->validacion_model->compartirDetalleCredito($_POST['id_det_credito']); 
+		//return $result;
+
+		echo json_encode($result);
+
+	}
+
 }?>

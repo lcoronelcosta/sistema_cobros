@@ -1728,4 +1728,34 @@ class Validacion_model extends CI_Model {
 
 	}
 
+	/**Compartir detalle del credito actual */
+	public function compartirDetalleCredito($id_det_credito)
+	{	
+		$result = $this->db->query("SELECT dc.*, c.celular FROM det_credito AS dc
+			INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
+			INNER JOIN cliente AS c ON c.id_cliente = cc.id_cliente
+			WHERE cc.id_cab_credito = (SELECT id_cab_credito FROM det_credito WHERE id_det_credito = $id_det_credito)
+		");
+		
+		$arreglo = null;
+		$detalleString = "*DETALLE*".'%0A';
+		$num_celular = isset($result->result_array()[0]['celular']) ? $result->result_array()[0]['celular'] : '';
+		foreach ($result->result_array() as $row) {
+			$saldo = $row['v_cuota']-$row['abono'];
+			$detalleString = $detalleString.'*Cuota'.$row['n_cuota'].'*'.'%0A';
+			$detalleString = $detalleString.'- Fecha: '.$row['fechapago'].'%0A';
+			$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
+			$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
+			$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
+		}
+		$resultData = array(
+			'success' => true,
+			'data' => $detalleString,
+			'celular' => $num_celular
+		);
+
+		return $resultData;
+		
+	}
+
 }?>

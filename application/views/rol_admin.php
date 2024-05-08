@@ -20,6 +20,11 @@ date_default_timezone_set('America/Bogota');?>
 	<script type="text/javascript" src="<?php echo base_url(); ?>js/dataTables.select.min.js"></script>
 	<script type="text/javascript" src="<?php echo base_url(); ?>js/dataTables.scroller.min.js"></script>	
 	<script src="<?php echo base_url(); ?>js/moment.min.js"></script>
+
+	<!-- Toast -->
+	<link href="<?php echo base_url(); ?>css/toastify.min.css" rel="stylesheet"/>
+    <script src="<?php echo base_url(); ?>js/toastify.min.js" defer></script>
+	
 </head>	
 <body  class="body_alterno">
 	<div class="container formulario">
@@ -313,6 +318,40 @@ date_default_timezone_set('America/Bogota');?>
 		 function(data,status){  });
 	}
 
+	function compartirDetalleCredito(id_det_credito){
+		$.post("<?= base_url() .'index.php/validacion/compartirDetalleCredito'?>",
+		{
+			id_det_credito: id_det_credito,
+		},
+		function(data,status){
+			if(data){
+				var resutlData = JSON.parse(data);
+				var celular = resutlData.celular;
+				if(celular == ""){
+					Toastify({
+						text: 'Error!. Cliente no tiene celular registrado',
+						duration: 3000,
+						newWindow: true,
+						close: true,
+						gravity: "top", // `top` or `bottom`
+						position: "right", // `left`, `center` or `right`
+						stopOnFocus: true, // Prevents dismissing of toast on hover
+						style: {
+							background: '#CC2906',
+						}
+					}).showToast();
+				}else{
+					if(celular.length == 10){
+						celular = '593'+celular.substring(1);
+					}
+					let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text='+resutlData.data;
+					//window.open(url, '_blank');
+					location.href = url;
+				}
+			}
+		});
+	}
+
 	var listar = function(fecha_i)
 	{
 				table = $('#tabla_cobros').DataTable();
@@ -387,8 +426,13 @@ date_default_timezone_set('America/Bogota');?>
 						  	}
 						},
 						{"data":"id_det_credito"},
-						{"defaultContent": "<button type='button' class='form btn-primary'> Reprogramar</button>"}
-						
+						//{"defaultContent": "<div><button type='button' class='form btn-primary'> Reprogramar</button> <button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito(id_cab_credito)'> <div style='text-align:center; color:green;'><i class='fa fa-share-alt'></i></div></button> <a href='tel:+593969458949' class='btn btn-lg' style='background-color:transparent;'> <div style='text-align:center; color:blue;'><i class='fa fa-phone'></i></div></a></div>"}
+						{"render":
+						  	function ( data, type, row ) {
+						  		//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
+								return ("<div><button type='button' class='form btn-primary'> Reprogramar</button> <button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito("+row["id_det_credito"]+")'> <div style='text-align:center; color:green;'><i class='fa fa-share-alt'></i></div></button> <a href='tel:+593969458949' class='btn btn-lg' style='background-color:transparent;'> <div style='text-align:center; color:blue;'><i class='fa fa-phone'></i></div></a></div>")
+							}
+						},
 						
 					],
 					//select: true,					
