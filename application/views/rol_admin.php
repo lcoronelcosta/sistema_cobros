@@ -430,7 +430,7 @@ date_default_timezone_set('America/Bogota');?>
 						{"render":
 						  	function ( data, type, row ) {
 						  		//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
-								return ("<div><button type='button' class='form btn-primary'> Reprogramar</button> <button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito("+row["id_det_credito"]+")'> <div style='text-align:center; color:green;'><i class='fa fa-share-alt'></i></div></button> <a href='tel:+593969458949' class='btn btn-lg' style='background-color:transparent;'> <div style='text-align:center; color:blue;'><i class='fa fa-phone'></i></div></a></div>")
+								return ("<div><button type='button' class='form btn-primary'> Reprogramar</button> <button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito("+row["id_det_credito"]+")'> <div style='text-align:center; color:green;'><i class='fa fa-share-alt'></i></div></button> <a href='tel:"+row["celular"]+"' class='btn btn-lg' style='background-color:transparent;'> <div style='text-align:center; color:blue;'><i class='fa fa-phone'></i></div></a></div>")
 							}
 						},
 						

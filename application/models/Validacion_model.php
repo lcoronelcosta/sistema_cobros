@@ -367,14 +367,14 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/
-		$result = $this->db->query("SELECT DC.id_det_credito ,CI.nombre, CI.apellido, round(DC.v_cuota,2) as v_cuota, round(DC.abono,2) as abono, CC.d_mora, CC.fecha_i, CC.mora, CC.totalapagar,CC.totalpagado, (SELECT round(sum(DC1.v_cuota - DC1.abono),2) FROM cliente CI1, cab_credito CC1, det_credito DC1 WHERE CI1.id_cliente=CC1.id_cliente and CC1.id_cab_credito=DC1.id_cab_credito and CI1.id_usuario = CI.id_usuario and DC1.estado='pendiente' and  DC1.fechapago = '". $this->input->post('fecha_i'). "' and DC1.n_cuota !=0) as t_cuota FROM cliente CI, cab_credito CC, det_credito DC WHERE CI.id_cliente=CC.id_cliente and CC.id_cab_credito=DC.id_cab_credito and CI.id_usuario =". $id_usuario. " and DC.estado='pendiente' and DC.fechapago = '". $this->input->post('fecha_i'). "' and DC.n_cuota !=0 order by CI.antecesor");
+		$result = $this->db->query("SELECT DC.id_det_credito ,CI.nombre, CI.apellido, CI.celular, round(DC.v_cuota,2) as v_cuota, round(DC.abono,2) as abono, CC.d_mora, CC.fecha_i, CC.mora, CC.totalapagar,CC.totalpagado, (SELECT round(sum(DC1.v_cuota - DC1.abono),2) FROM cliente CI1, cab_credito CC1, det_credito DC1 WHERE CI1.id_cliente=CC1.id_cliente and CC1.id_cab_credito=DC1.id_cab_credito and CI1.id_usuario = CI.id_usuario and DC1.estado='pendiente' and  DC1.fechapago = '". $this->input->post('fecha_i'). "' and DC1.n_cuota !=0) as t_cuota FROM cliente CI, cab_credito CC, det_credito DC WHERE CI.id_cliente=CC.id_cliente and CC.id_cab_credito=DC.id_cab_credito and CI.id_usuario =". $id_usuario. " and DC.estado='pendiente' and DC.fechapago = '". $this->input->post('fecha_i'). "' and DC.n_cuota !=0 order by CI.antecesor");
 
 
 		$arreglo = null;		
 		foreach ($result->result_array() as $row) {
 			$arreglo["data"][] = $row;
 		}
-		
+
 		//****************************************************************
 		//En caso que no exista informaci�n de solicitudes para el usuario
 		//****************************************************************
@@ -396,6 +396,7 @@ class Validacion_model extends CI_Model {
 			SELECT min(DC.id_det_credito) AS id_det_credito, 
 				CI.nombre, 
 				CI.apellido, 
+				CI.celular,
 				round(DC.v_cuota,2) as v_cuota, 
 				round(DC.abono,2) as abono, 
 				CC.fecha_i, 
