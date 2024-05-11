@@ -628,7 +628,7 @@ class Validacion_model extends CI_Model {
       	$valor = round(($interes * $porcentaje_comision) / 100, 2);
       	$comision_mora_completo = round(($mora * $porcentaje_comision) / 100, 2);
 
-      	$band = $this->validacion_model->abonar_al_credito_detalle($id_cab_credito, $valor_abono, $id_cobrador,$valor, true, $comision_mora_completo);
+//      	$band = $this->validacion_model->abonar_al_credito_detalle($id_cab_credito, $valor_abono, $id_cobrador,$valor, true, $comision_mora_completo);
 		
 		//****************************************************************
 		//Cuando quiera liquidar la cuenta del cliente, Estado->Cancelado
@@ -639,18 +639,16 @@ class Validacion_model extends CI_Model {
 
 		if ($result_estado['estado'] != 'cancelado')
 		{
-
-			if ($liquidar == "true")
+			$liquida = ($liquidar == 'true') ? true : false;
+			if ($liquida)
 			{
-						
-				$this->db->set('totalpagado','totalpagado +'. (float)$saldo_liquidar, FALSE);
 				$this->db->set('estado',"cancelado");
 	      		$this->db->where('id_cab_credito', $id_cab_credito);
 	      		$this->db->update('cab_credito');
 
+//				  $band1 = $this->validacion_model->abonar_al_credito_detalle($id_cab_credito, $saldo_liquidar, $id_cobrador,$valor,false, $comision_mora_completo);
 
-				$band1 = $this->validacion_model->abonar_al_credito_detalle($id_cab_credito, $saldo_liquidar, $id_cobrador,$valor,false, $comision_mora_completo);
-
+/*
 				//****************************************************************
 				//Se guarda la liquidacion de la cuenta para el cuadre de caja
 				//del cobrador (debe / haber)
@@ -715,8 +713,11 @@ class Validacion_model extends CI_Model {
 				{
 					$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$saldo_liquidar,'D',"FALTANTE");
 				}
-
+*/
 			}
+
+			$band1 = $this->validacion_model->abonar_al_credito_detalle($id_cab_credito, $valor_abono, $id_cobrador,$valor,!$liquida, $comision_mora_completo);
+
 		}
 
 	}
@@ -741,10 +742,12 @@ class Validacion_model extends CI_Model {
 		//*****************************************************
 		//Cada cuota se va cancelando seg�n el abono realizado
 		//*****************************************************
-		$this->load->helper('url'); 
+		$this->load->helper('url');
 
 		$query = $this->db->query("SELECT id_det_credito, v_cuota, abono FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente'");
-		
+
+		//log_message('error', json_encode($query->result_array()));
+		//exit();
 
 		foreach ($query->result_array() as $row) {
 			$cuota = round($row["v_cuota"],2);
@@ -752,7 +755,7 @@ class Validacion_model extends CI_Model {
 			$id_det_credito_t = $row["id_det_credito"];
 
 			
-			if (! $sinliquidar)
+			if (! $sinliquidar )//aplica liquidacion
 			{			
 				$this->db->set('estado',"cancelado");
 		      	$this->db->where('id_det_credito', $id_det_credito_t);
@@ -782,8 +785,10 @@ class Validacion_model extends CI_Model {
 			}			
 		}
 
-		
+		return false;
 
+		
+/*
 		if ($valor_abono >= 0 and $sinliquidar)
 		{
 			
@@ -803,6 +808,7 @@ class Validacion_model extends CI_Model {
 		{
 			return 0;
 		}
+*/		
 	}
 
     public function registrar_gasto($id_usuario_tmp)
@@ -1561,6 +1567,7 @@ class Validacion_model extends CI_Model {
 		//*****************************************************
 		//Consulta todos los creditos vencidos y actualiza la mora
 		//*****************************************************
+		$this->db->query("SET GLOBAL time_zone = '-05:00'");
 		$query = $this->db->query("SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos, 	round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes FROM cab_credito cc where cc.fecha_f < CURDATE() and cc.estado='pendiente'");
 		
 		foreach ($query->result_array() as $row) {
