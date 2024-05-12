@@ -21,13 +21,13 @@ class Menu_principal extends CI_Controller {
 	public function inicio()
 	{
 		//******************************************************
-		//Leo la variable de sesión para leer los datos internos
+		//Leo la variable de sesiï¿½n para leer los datos internos
 		//******************************************************
 		$array = $this->session->userdata('usuario_data');
-		if ($array['tipo_usuario'] == "administrador")
+		if ( isset($array['tipo_usuario']) && $array['tipo_usuario'] == "administrador")
 		{
 			$this->load->view('rol_admin', $array);
-		}elseif ($array['tipo_usuario'] == "cobrador")
+		}elseif (isset($array['tipo_usuario']) && $array['tipo_usuario'] == "cobrador")
 		{
 			$this->load->view('rol_cobrador', $array);
 		}else
@@ -39,7 +39,7 @@ class Menu_principal extends CI_Controller {
 	public function solicitud_permiso()
 	{
 		//******************************************************
-		//Leo la variable de sesión para leer los datos internos
+		//Leo la variable de sesiï¿½n para leer los datos internos
 		//******************************************************							
 		$array = $this->session->userdata('usuario_data');				
 		$this->load->view('solicitud_permiso',$array);
