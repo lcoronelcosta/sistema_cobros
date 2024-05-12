@@ -1567,7 +1567,7 @@ class Validacion_model extends CI_Model {
 		//*****************************************************
 		//Consulta todos los creditos vencidos y actualiza la mora
 		//*****************************************************
-		$this->db->query("SET GLOBAL time_zone = '-05:00'");
+		$this->db->query("SET time_zone = '-05:00'");
 		$query = $this->db->query("SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos, 	round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes FROM cab_credito cc where cc.fecha_f < CURDATE() and cc.estado='pendiente'");
 		
 		foreach ($query->result_array() as $row) {
