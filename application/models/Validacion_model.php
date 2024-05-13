@@ -1737,6 +1737,10 @@ class Validacion_model extends CI_Model {
 			INNER JOIN cliente AS c ON c.id_cliente = cc.id_cliente
 			WHERE cc.id_cab_credito = (SELECT id_cab_credito FROM det_credito WHERE id_det_credito = $id_det_credito)
 		");
+
+		$result_abonos = $this->db->query("SELECT * FROM abono AS a 
+			WHERE a.id_cab_credito = (SELECT id_cab_credito FROM det_credito WHERE id_det_credito = $id_det_credito)"
+		);
 		
 		$arreglo = null;
 		$detalleString = "*DETALLE*".'%0A';
@@ -1757,6 +1761,17 @@ class Validacion_model extends CI_Model {
 			$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
 			$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
 		}
+
+		//Abonos
+		$detalleString = $detalleString.'*ABONOS*'.'%0A';
+		$cont = 1;
+		foreach ($result_abonos->result_array() as $row) {
+			$detalleString = $detalleString.'*Abono*'.$cont.'%0A';
+			$detalleString = $detalleString.'- Fecha: '.$row['fecha'].'%0A';
+			$detalleString = $detalleString.'- Valor: '.(float)$row['valor'].'%0A';
+			$cont++;
+		}
+		
 		$detalleString = $detalleString.'%0A'.'*Total adeudado: $'.$saldoTotal.'*';
 		$resultData = array(
 			'success' => true,
