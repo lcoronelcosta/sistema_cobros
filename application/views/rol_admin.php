@@ -66,7 +66,39 @@ date_default_timezone_set('America/Bogota');?>
 						</form>
                     </div>
                 </div>
-				<div class="myform-bottom2" style="width: 100%">    
+				<div class="myform-bottom2" style="width: 100%">  
+				
+				<hr>
+
+				<!--<table id="tabla_cobros" class="display" style="width:100%">
+					<thead>
+						<tr>
+							<th>Fecha</th>
+							<th>Cliente</th>
+							<th>Cuota</th>
+							<th>Mora</th>						
+							<th>Saldo</th>
+							<th>Id</th>
+							<th>Opción</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<th>Fecha</th>
+							<th>Cliente</th>
+							<th>Cuota</th>
+							<th>Mora</th>						
+							<th>Saldo</th>
+							<th>Id</th>
+							<th>Opción</th>
+							<th></th>
+						</tr>
+					</tfoot>
+				</table>-->
+
+				<hr>
+				
 				<table>
                 	<tr>
 	                	<td>Fecha: </td>
@@ -301,7 +333,118 @@ date_default_timezone_set('America/Bogota');?>
 	        }
 	    } );
 
+		// Escucha el evento de búsqueda del DataTable
+		$('#tabla_cobros').DataTable().on('search.dt', function() {
+			sumarColumna();
+		});
+
+		// Llama a la función para calcular la suma al cargar la página
+		sumarColumna();
+
+		console.log(path)
+		
+
+
     });
+
+/*	var listar = function (fecha_inicial){
+		table = $('#tabla_cobros').DataTable().destroy();
+
+		$('#tabla_cobros').DataTable({
+			dom: "Bfrtip",
+			rowId: 'id_det_credito',
+			responsive: true,
+			select: true,
+			deferRender: true,
+			scrollY: '330px',
+			scrollX: true,
+			scrollCollapse: true,
+			scroller: true,
+			animate: true,
+			paging: true,
+
+			ajax:{
+				"method":"POST",
+				"url":path,
+				"data" : {"fecha_i": fecha_inicial}						
+			},
+
+			columns:[
+				{"render":
+					function ( data, type, row ) {
+						return (moment(String(row["fecha_i"])).format('YYMMDD'))    				         					
+					}
+				},
+				{"data":"nombre_completo"},
+				{"data": "cuota_pendiente"},
+				{"data": "mora_pendiente"},
+				{"data": "saldo_total"},
+				{"data":"id_det_credito"},
+				{"render":
+					function ( data, type, row ) {
+						//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
+						$("#t_cuota").val(row["t_cuota"]);
+						return (`
+						<div>
+							<button class='form btn btn-lg' style='background-color:transparent;'> 
+								<div style='text-align:center; color:black;'>
+									<i class="fa fa-registered" aria-hidden="true"></i>
+								</div>
+							</button>
+							<button class='btn btn-lg' style='background-color:transparent;' onclick='acuerdoDePago("${row["celular"]}")'> 
+								<div style='text-align:center; color:green;'>
+									<i class='fa fa-whatsapp'></i>
+								</div>
+							</button>
+						</div>`);
+					}
+				},
+				{"render":
+					function ( data, type, row ) {
+						//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
+						return (`
+						<details class="dropdown">
+							<summary role="button">
+								<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+							</summary>
+							<ul >
+								<li style="font-size:12px; margin-left: 10px" onclick='compartirDetalleCredito("${row["id_det_credito"]}")'>
+									<span>
+										<a style='color:green;'>
+											<i class='fa fa-share-alt'>&emsp;Compartir</i>
+										</a>
+									<span/>
+								</li>
+								<li style="font-size:12px">
+									<span>
+										<a href='tel:${row["celular"]}' style='color:blue;'>
+											<i class='fa fa-phone'>&emsp;Llamar</i>
+										</a>
+									<span/>
+								</li>
+							</ul>
+						</details>
+						`);
+					}
+				}
+			],
+			"buttons": [
+					
+					]
+		});
+	}
+*/
+	function sumarColumna() {
+		var suma = 0;
+		$('#tabla_cobros').DataTable().column(2, { search: 'applied' }).data().each(function(value) {
+			suma += parseFloat(value);
+		});
+		suma = parseFloat(suma).toFixed(2)
+		console.log("La suma de la columna es: " + suma);
+		$("#t_cuota").val(suma);
+		// Puedes mostrar la suma donde quieras, por ejemplo, en un elemento HTML
+		//$('#sumaColumna').text("La suma de la columna es: " + suma);
+	}
 
 	function reload1()
 	{
@@ -394,6 +537,7 @@ date_default_timezone_set('America/Bogota');?>
         			'scroller': true,
         			"animate": true,
 					"paging": true,
+					scrollX: true,
 					"language": {
 				            processing:     "Tratamiento en curso...",
 				            search:         "Buscar:",
@@ -419,47 +563,22 @@ date_default_timezone_set('America/Bogota');?>
 								 }						
 					},
 
-					"columns":[
-					    {"render":
+					columns:[
+						{"render":
 							function ( data, type, row ) {
 								return (moment(String(row["fecha_i"])).format('YYMMDD'))    				         					
-						 	}
+							}
 						},
-						//{"data":"fecha_i"},
-					    {"render":
-							function ( data, type, row ) {
-						  		return (row["nombre"] + " " + row["apellido"]) ;    
-						  		        					
-						  	}
-						},
-						{"render":
-						  	function ( data, type, row ) {
-						  		var total = row["t_cuota"]; 
-								$("#t_cuota").val(total);
-						  		return (parseFloat(row["v_cuota"] - row["abono"]).toFixed(2));          					
-						  	}
-						},
-						 {"render":
-							function ( data, type, row ) {
-						  		return (row["d_mora"] + "D-$" + row["mora"]) ;    
-						  		        					
-						  	}
-						},		
-						//{"data":"d_mora"},
-						//{"data":"mora"},
-						{"render":
-						  	function ( data, type, row ) {
-						  		return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
-						  	}
-						},
+						{"data":"nombre_completo"},
+						{"data": "cuota_pendiente"},
+						{"data": "mora_pendiente"},
+						{"data": "saldo_total"},
 						{"data":"id_det_credito"},
-						//{"defaultContent": "<div><button type='button' class='form btn-primary'> Reprogramar</button> <button class='btn btn-lg' style='background-color:transparent;' onclick='compartirDetalleCredito(id_cab_credito)'> <div style='text-align:center; color:green;'><i class='fa fa-share-alt'></i></div></button> <a href='tel:+593969458949' class='btn btn-lg' style='background-color:transparent;'> <div style='text-align:center; color:blue;'><i class='fa fa-phone'></i></div></a></div>"}
 						{"render":
-						  	function ( data, type, row ) {
-						  		//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
+							function ( data, type, row ) {
+								//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
 								return (`
 								<div>
-									<!--<button type='button' class='form btn-primary'> Reprogramar</button>-->
 									<button class='form btn btn-lg' style='background-color:transparent;'> 
 										<div style='text-align:center; color:black;'>
 											<i class="fa fa-registered" aria-hidden="true"></i>
@@ -474,8 +593,8 @@ date_default_timezone_set('America/Bogota');?>
 							}
 						},
 						{"render":
-						  	function ( data, type, row ) {
-						  		//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
+							function ( data, type, row ) {
+								//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
 								return (`
 								<details class="dropdown">
 									<summary role="button">
@@ -501,7 +620,6 @@ date_default_timezone_set('America/Bogota');?>
 								`);
 							}
 						}
-						
 					],
 					//select: true,					
 					"buttons": [
