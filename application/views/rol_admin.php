@@ -432,7 +432,7 @@ date_default_timezone_set('America/Bogota');?>
 */
 	function sumarColumna() {
 		var suma = 0;
-		$('#tabla_cobros').DataTable().column(2, { search: 'applied' }).data().each(function(value) {
+		$('#tabla_cobros').DataTable().column(4, { search: 'applied' }).data().each(function(value) {
 			var cuota = parseFloat(value.replace(/,/g, ""));
 			suma += cuota;
 		});
