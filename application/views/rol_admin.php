@@ -223,6 +223,15 @@ date_default_timezone_set('America/Bogota');?>
 	var b_rep=0;
 	var raw_select=-1;
 
+	let USDollar = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+	});
+	/*uso
+	USDollar.format(price))
+	*/
+
+
 	$(document).ready(function(e) {
 	   	actualizar_mora();
 	    $("#t_cuota").val("0");

@@ -79,15 +79,23 @@ class Validacion_model extends CI_Model {
 
 	}
 
-	public function calcular_amortizacion_diaria()
+	public function calcular_amortizacion_diaria($data = [])
 	{
 		/*
 		Se conecta con una llama del Script por AJAX
-		*/			
-		$valor_t = $_POST ['valor_t'];
-		$tasa_t = $_POST ['tasa_t'];
-		$plazo_t = $_POST ['plazo_t'];
-		$fecha_i_t = $_POST ['fecha_i_t'];
+		*/		
+		$valor_t = $tasa_t = $plazo_t = $fecha_i_t = 0;
+		if(!empty($data)){
+			$valor_t = $data['valor_t'];
+			$tasa_t = $data['tasa_t'];
+			$plazo_t = $data['plazo_t'];
+			$fecha_i_t = $data['fecha_i_t'];
+		}else{
+			$valor_t = $_POST ['valor_t'];
+			$tasa_t = $_POST ['tasa_t'];
+			$plazo_t = $_POST ['plazo_t'];
+			$fecha_i_t = $_POST ['fecha_i_t'];
+		}	
 
 		if ($plazo_t == 45)
 		{
@@ -117,19 +125,30 @@ class Validacion_model extends CI_Model {
 			$i++;
 		}
 		$row = substr($row, 0,strlen($row) - 1);
+		if(!empty($data))
+			return '{"data":['.$row.']}';
         echo '{"data":['.$row.']}';
 
 	}
 
-	public function calcular_amortizacion_semanal()
+	public function calcular_amortizacion_semanal($data = [])
 	{
 		/*
 		Se conecta con una llama del Script por AJAX
-		*/			
-		$valor_t = $_POST ['valor_t'];
-		$tasa_t = $_POST ['tasa_t'];
-		$plazo_t = $_POST ['plazo_t'];
-		$fecha_i_t = $_POST ['fecha_i_t'];
+		*/		
+		$valor_t = $tasa_t = $plazo_t = $fecha_i_t = 0;
+		if(!empty($data)){
+			$valor_t = $data['valor_t'];
+			$tasa_t = $data['tasa_t'];
+			$plazo_t = $data['plazo_t'];
+			$fecha_i_t = $data['fecha_i_t'];
+		}else{
+			$valor_t = $_POST ['valor_t'];
+			$tasa_t = $_POST ['tasa_t'];
+			$plazo_t = $_POST ['plazo_t'];
+			$fecha_i_t = $_POST ['fecha_i_t'];
+		}
+		
 
 		$n_cuota = $plazo_t / 7;
 		$n_cuota = floor($n_cuota);
@@ -173,19 +192,29 @@ class Validacion_model extends CI_Model {
 			$i++;
 		}
 		$row = substr($row, 0,strlen($row) - 1);
+		if(!empty($data))
+			return '{"data":['.$row.']}';
         echo '{"data":['.$row.']}';
 
 	}
 
-	public function calcular_amortizacion_quincenal()
+	public function calcular_amortizacion_quincenal($data = [])
 	{
 		/*
 		Se conecta con una llama del Script por AJAX
-		*/			
-		$valor_t = $_POST ['valor_t'];
-		$tasa_t = $_POST ['tasa_t'];
-		$plazo_t = $_POST ['plazo_t'];
-		$fecha_i_t = $_POST ['fecha_i_t'];
+		*/	
+		$valor_t = $tasa_t = $plazo_t = $fecha_i_t = 0;
+		if(!empty($data)){
+			$valor_t = $data['valor_t'];
+			$tasa_t = $data['tasa_t'];
+			$plazo_t = $data['plazo_t'];
+			$fecha_i_t = $data['fecha_i_t'];
+		}else{
+			$valor_t = $_POST ['valor_t'];
+			$tasa_t = $_POST ['tasa_t'];
+			$plazo_t = $_POST ['plazo_t'];
+			$fecha_i_t = $_POST ['fecha_i_t'];
+		}		
 
 		$n_cuota = $plazo_t / 15;
 		$n_cuota = floor($n_cuota);
@@ -247,19 +276,29 @@ class Validacion_model extends CI_Model {
 			$i++;
 		}
 		$row = substr($row, 0,strlen($row) - 1);
+		if(!empty($data))
+			return '{"data":['.$row.']}';
         echo '{"data":['.$row.']}';
 
 	}
 
-	public function calcular_amortizacion_mensual()
+	public function calcular_amortizacion_mensual($data = [])
 	{
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/			
-		$valor_t = $_POST ['valor_t'];
-		$tasa_t = $_POST ['tasa_t'];
-		$plazo_t = $_POST ['plazo_t'];
-		$fecha_i_t = $_POST ['fecha_i_t'];
+		$valor_t = $tasa_t = $plazo_t = $fecha_i_t = 0;
+		if(!empty($data)){
+			$valor_t = $data['valor_t'];
+			$tasa_t = $data['tasa_t'];
+			$plazo_t = $data['plazo_t'];
+			$fecha_i_t = $data['fecha_i_t'];
+		}else{
+			$valor_t = $_POST ['valor_t'];
+			$tasa_t = $_POST ['tasa_t'];
+			$plazo_t = $_POST ['plazo_t'];
+			$fecha_i_t = $_POST ['fecha_i_t'];
+		}		
 
 		$n_cuota = $plazo_t / 30;
 		$n_cuota = floor($n_cuota);
@@ -297,6 +336,8 @@ class Validacion_model extends CI_Model {
 			$i++;
 		}
 		$row = substr($row, 0,strlen($row) - 1);
+		if(!empty($data))
+			return '{"data":['.$row.']}';
         echo '{"data":['.$row.']}';
 
 	}
@@ -1767,31 +1808,44 @@ class Validacion_model extends CI_Model {
 	/**Compartir detalle del credito actual */
 	public function compartirDetalleCredito($id_det_credito)
 	{	
-		$result = $this->db->query("SELECT cc.d_mora, dc.*, c.celular FROM det_credito AS dc
+		$result = $this->db->query("SELECT cc.d_mora, cc.tasa, cc.plazo, cc.fecha_i, cc.id_formadepago, cc.valor, dc.*, c.celular FROM det_credito AS dc
 			INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
 			INNER JOIN cliente AS c ON c.id_cliente = cc.id_cliente
 			WHERE cc.id_cab_credito = (SELECT id_cab_credito FROM det_credito WHERE id_det_credito = $id_det_credito)
+			ORDER BY dc.id_det_credito ASC
 		");
 
 		$result_abonos = $this->db->query("SELECT * FROM abono AS a 
 			WHERE a.id_cab_credito = (SELECT id_cab_credito FROM det_credito WHERE id_det_credito = $id_det_credito)"
 		);
-		
+
+		$data = [
+			'valor_t' => $result->result_array()[0]['valor'],
+			'tasa_t' => $result->result_array()[0]['tasa'],
+			'plazo_t' => $result->result_array()[0]['plazo'],
+			'fecha_i_t' => $result->result_array()[0]['fecha_i'],
+			'id_formadepago' => $result->result_array()[0]['id_formadepago'],
+		];
+		$amortizacionInicial = json_decode($this->getDetalleAmortizacionInicial($data));
+
 		$arreglo = null;
 		$detalleString = "*DETALLE*".'%0A';
 		$num_celular = isset($result->result_array()[0]['celular']) ? $result->result_array()[0]['celular'] : '';
 		$diasMora = isset($result->result_array()[0]['d_mora']) ? $result->result_array()[0]['d_mora'] : '';
 		$saldoTotal = 0;
+		$cont = 0;
 		foreach ($result->result_array() as $row) {
 			$saldo = $row['v_cuota']-$row['abono'];
 			$saldoTotal = $saldo+$saldoTotal;
 			if($row['n_cuota'] == 0){
 				$detalleString = $detalleString.'*Mora*'.'%0A';
 				$detalleString = $detalleString.'- Días: '.$diasMora.'%0A';
+				$detalleString = $detalleString.'- Fecha: '.$row['fechapago'].'%0A';
 			}else{
 				$detalleString = $detalleString.'*Cuota'.$row['n_cuota'].'*'.'%0A';
+				$detalleString = $detalleString.'- Fecha: '.$amortizacionInicial->data[$cont]->fecha.'%0A';
+				$cont++;
 			}
-			$detalleString = $detalleString.'- Fecha: '.$row['fechapago'].'%0A';
 			$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
 			$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
 			$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
@@ -1817,8 +1871,32 @@ class Validacion_model extends CI_Model {
 		return $resultData;
 		
 	}
-
 	/**Genera el detalle del credito inicial para ser compartido*/
+
+	/**Genera la tabla de amortizacion para compartir */
+	public function getDetalleAmortizacionInicial($data){
+		
+		$id_formadepago = $data['id_formadepago'];
+
+		switch ($id_formadepago) {
+			case '1':
+				return $this->calcular_amortizacion_diaria($data);
+				break;
+			case '2':
+				return $this->calcular_amortizacion_semanal($data);
+				break;
+			case '2':
+				return $this->calcular_amortizacion_quincenal($data);
+				break;
+			case '2':
+				return $this->calcular_amortizacion_mensual($data);
+				break;
+			default:
+				# code...
+				break;
+		}
+		
+	}
 	
 
 
