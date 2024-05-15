@@ -1812,7 +1812,6 @@ class Validacion_model extends CI_Model {
 			INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
 			INNER JOIN cliente AS c ON c.id_cliente = cc.id_cliente
 			WHERE cc.id_cab_credito = (SELECT id_cab_credito FROM det_credito WHERE id_det_credito = $id_det_credito)
-			ORDER BY dc.id_det_credito ASC
 		");
 
 		$result_abonos = $this->db->query("SELECT * FROM abono AS a 
@@ -1826,6 +1825,7 @@ class Validacion_model extends CI_Model {
 			'fecha_i_t' => $result->result_array()[0]['fecha_i'],
 			'id_formadepago' => $result->result_array()[0]['id_formadepago'],
 		];
+		
 		$amortizacionInicial = json_decode($this->getDetalleAmortizacionInicial($data));
 
 		$arreglo = null;
@@ -1833,7 +1833,8 @@ class Validacion_model extends CI_Model {
 		$num_celular = isset($result->result_array()[0]['celular']) ? $result->result_array()[0]['celular'] : '';
 		$diasMora = isset($result->result_array()[0]['d_mora']) ? $result->result_array()[0]['d_mora'] : '';
 		$saldoTotal = 0;
-		$cont = 0;
+		$i = 0;
+		var_dump(count($result->result_array()));
 		foreach ($result->result_array() as $row) {
 			$saldo = $row['v_cuota']-$row['abono'];
 			$saldoTotal = $saldo+$saldoTotal;
@@ -1843,8 +1844,8 @@ class Validacion_model extends CI_Model {
 				$detalleString = $detalleString.'- Fecha: '.$row['fechapago'].'%0A';
 			}else{
 				$detalleString = $detalleString.'*Cuota'.$row['n_cuota'].'*'.'%0A';
-				$detalleString = $detalleString.'- Fecha: '.$amortizacionInicial->data[$cont]->fecha.'%0A';
-				$cont++;
+				$detalleString = $detalleString.'- Fecha: '.$amortizacionInicial->data[$i]->fecha.'%0A';
+				$i++;
 			}
 			$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
 			$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
@@ -1885,10 +1886,10 @@ class Validacion_model extends CI_Model {
 			case '2':
 				return $this->calcular_amortizacion_semanal($data);
 				break;
-			case '2':
+			case '3':
 				return $this->calcular_amortizacion_quincenal($data);
 				break;
-			case '2':
+			case '4':
 				return $this->calcular_amortizacion_mensual($data);
 				break;
 			default:
