@@ -1825,7 +1825,7 @@ class Validacion_model extends CI_Model {
 			'fecha_i_t' => $result->result_array()[0]['fecha_i'],
 			'id_formadepago' => $result->result_array()[0]['id_formadepago'],
 		];
-		
+
 		$amortizacionInicial = json_decode($this->getDetalleAmortizacionInicial($data));
 
 		$arreglo = null;
@@ -1834,7 +1834,6 @@ class Validacion_model extends CI_Model {
 		$diasMora = isset($result->result_array()[0]['d_mora']) ? $result->result_array()[0]['d_mora'] : '';
 		$saldoTotal = 0;
 		$i = 0;
-		var_dump(count($result->result_array()));
 		foreach ($result->result_array() as $row) {
 			$saldo = $row['v_cuota']-$row['abono'];
 			$saldoTotal = $saldo+$saldoTotal;
