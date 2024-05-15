@@ -68,8 +68,6 @@ date_default_timezone_set('America/Bogota');?>
                 </div>
 				<div class="myform-bottom2" style="width: 100%">  
 				
-				<hr>
-
 				<!--<table id="tabla_cobros" class="display" style="width:100%">
 					<thead>
 						<tr>
@@ -97,8 +95,6 @@ date_default_timezone_set('America/Bogota');?>
 					</tfoot>
 				</table>-->
 
-				<hr>
-				
 				<table>
                 	<tr>
 	                	<td>Fecha: </td>
