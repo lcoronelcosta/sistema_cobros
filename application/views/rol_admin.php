@@ -433,11 +433,12 @@ date_default_timezone_set('America/Bogota');?>
 	function sumarColumna() {
 		var suma = 0;
 		$('#tabla_cobros').DataTable().column(2, { search: 'applied' }).data().each(function(value) {
-			suma += parseFloat(value);
+			var cuota = parseFloat(value.replace(/,/g, ""));
+			suma += cuota;
 		});
-		suma = parseFloat(suma).toFixed(2)
+		//suma = parseFloat(suma).toFixed(2)
 		console.log("La suma de la columna es: " + suma);
-		$("#t_cuota").val(suma);
+		$("#t_cuota").val(suma.toFixed(2));
 		// Puedes mostrar la suma donde quieras, por ejemplo, en un elemento HTML
 		//$('#sumaColumna').text("La suma de la columna es: " + suma);
 	}
