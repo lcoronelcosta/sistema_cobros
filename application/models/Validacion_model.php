@@ -1855,7 +1855,7 @@ class Validacion_model extends CI_Model {
 		$detalleString = $detalleString.'*ABONOS*'.'%0A';
 		$cont = 1;
 		foreach ($result_abonos->result_array() as $row) {
-			$detalleString = $detalleString.'*Abono*'.$cont.'%0A';
+			$detalleString = $detalleString.'*Abono'.$cont.'*'.'%0A';
 			$detalleString = $detalleString.'- Fecha: '.$row['fecha'].'%0A';
 			$detalleString = $detalleString.'- Valor: '.(float)$row['valor'].'%0A';
 			$cont++;
