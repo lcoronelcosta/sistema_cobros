@@ -27,6 +27,9 @@ date_default_timezone_set('America/Bogota');?>
 
 	<link href="<?php echo base_url(); ?>css/popper.css" rel="stylesheet"/>
 
+	<!-- CDN Sweet alert-->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>	
 <body  class="body_alterno">
 	<div class="container formulario">
@@ -494,26 +497,34 @@ date_default_timezone_set('America/Bogota');?>
 			if(data){
 				var resutlData = JSON.parse(data);
 				var celular = resutlData.celular;
-				if(celular == ""){
-					Toastify({
-						text: 'Error!. Cliente no tiene celular registrado',
-						duration: 3000,
-						newWindow: true,
-						close: true,
-						gravity: "top", // `top` or `bottom`
-						position: "right", // `left`, `center` or `right`
-						stopOnFocus: true, // Prevents dismissing of toast on hover
-						style: {
-							background: '#CC2906',
-						}
-					}).showToast();
+				if(!resutlData.success){
+					Swal.fire({
+						icon: "error",
+						title: "Oops...",
+						text: "Lo sentimos ocurrio un error interno, la cantidad de cuotas de la tabla de amortizacion, no coincide con la cantidad de detalles encontrados en los registros!",
+					});
 				}else{
-					if(celular.length == 10){
-						celular = '593'+celular.substring(1);
+					if(celular == ""){
+						Toastify({
+							text: 'Error!. Cliente no tiene celular registrado',
+							duration: 3000,
+							newWindow: true,
+							close: true,
+							gravity: "top", // `top` or `bottom`
+							position: "right", // `left`, `center` or `right`
+							stopOnFocus: true, // Prevents dismissing of toast on hover
+							style: {
+								background: '#CC2906',
+							}
+						}).showToast();
+					}else{
+						if(celular.length == 10){
+							celular = '593'+celular.substring(1);
+						}
+						let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text='+resutlData.data;
+						//window.open(url, '_blank');
+						location.href = url;
 					}
-					let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text='+resutlData.data;
-					//window.open(url, '_blank');
-					location.href = url;
 				}
 			}
 		});

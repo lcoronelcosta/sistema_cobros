@@ -1828,42 +1828,61 @@ class Validacion_model extends CI_Model {
 
 		$amortizacionInicial = json_decode($this->getDetalleAmortizacionInicial($data));
 
-		$arreglo = null;
 		$detalleString = "*DETALLE*".'%0A';
 		$num_celular = isset($result->result_array()[0]['celular']) ? $result->result_array()[0]['celular'] : '';
 		$diasMora = isset($result->result_array()[0]['d_mora']) ? $result->result_array()[0]['d_mora'] : '';
 		$saldoTotal = 0;
 		$i = 0;
+		$tieneCuotaCero = false;
+		$success = false;
 		foreach ($result->result_array() as $row) {
-			$saldo = $row['v_cuota']-$row['abono'];
-			$saldoTotal = $saldo+$saldoTotal;
 			if($row['n_cuota'] == 0){
-				$detalleString = $detalleString.'*Mora*'.'%0A';
-				$detalleString = $detalleString.'- Días: '.$diasMora.'%0A';
-				$detalleString = $detalleString.'- Fecha: '.$row['fechapago'].'%0A';
-			}else{
-				$detalleString = $detalleString.'*Cuota'.$row['n_cuota'].'*'.'%0A';
-				$detalleString = $detalleString.'- Fecha: '.$amortizacionInicial->data[$i]->fecha.'%0A';
-				$i++;
+				$tieneCuotaCero = true;
+				break; 
 			}
-			$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
-			$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
-			$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
 		}
 
-		//Abonos
-		$detalleString = $detalleString.'*ABONOS*'.'%0A';
-		$cont = 1;
-		foreach ($result_abonos->result_array() as $row) {
-			$detalleString = $detalleString.'*Abono'.$cont.'*'.'%0A';
-			$detalleString = $detalleString.'- Fecha: '.$row['fecha'].'%0A';
-			$detalleString = $detalleString.'- Valor: '.(float)$row['valor'].'%0A';
-			$cont++;
+		if(!$tieneCuotaCero && (count($result->result_array()) == count($amortizacionInicial->data))){
+			$success = true;
+		}else if($tieneCuotaCero && (count($result->result_array()) -1 == count($amortizacionInicial->data))){
+			$success = true;
+		}else{
+			$success = false;
 		}
-		
-		$detalleString = $detalleString.'%0A'.'*Total adeudado: $'.$saldoTotal.'*';
+
+		if($success){
+			foreach ($result->result_array() as $row) {
+				$saldo = $row['v_cuota']-$row['abono'];
+				$saldoTotal = $saldo+$saldoTotal;
+				if($row['n_cuota'] == 0){
+					$detalleString = $detalleString.'*Mora*'.'%0A';
+					$detalleString = $detalleString.'- Días: '.$diasMora.'%0A';
+					$detalleString = $detalleString.'- Fecha: '.$row['fechapago'].'%0A';
+				}else{
+					$detalleString = $detalleString.'*Cuota'.$row['n_cuota'].'*'.'%0A';
+					$detalleString = $detalleString.'- Fecha: '.$amortizacionInicial->data[$i]->fecha.'%0A';
+					$i++;
+				}
+				$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
+				$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
+				$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
+			}
+	
+			//Abonos
+			$detalleString = $detalleString.'*ABONOS*'.'%0A';
+			$cont = 1;
+			foreach ($result_abonos->result_array() as $row) {
+				$detalleString = $detalleString.'*Abono'.$cont.'*'.'%0A';
+				$detalleString = $detalleString.'- Fecha: '.$row['fecha'].'%0A';
+				$detalleString = $detalleString.'- Valor: '.(float)$row['valor'].'%0A';
+				$cont++;
+			}
+			
+			$detalleString = $detalleString.'%0A'.'*Total adeudado: $'.$saldoTotal.'*';
+		}
+
 		$resultData = array(
-			'success' => true,
+			'success' => $success,
 			'data' => $detalleString,
 			'celular' => $num_celular
 		);
