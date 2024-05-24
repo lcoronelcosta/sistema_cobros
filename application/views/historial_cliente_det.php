@@ -127,10 +127,12 @@ date_default_timezone_set('America/Bogota');
 							  	function ( data, type, row ) {
 							  		var total_mora = row["t_mora"]; 
 									$("#t_mora").val(total_mora);
+									var total_mora_real = row["t_mora_real"]; 
+									$("#t_mora_real").val(total_mora_real);
 									//*****************************************************************
 							  		//Para llenar el campo total 
 							  		//*****************************************************************
-							  		var t_total = parseFloat(parseFloat($("#t_interes").val()) + parseFloat($("#t_mora").val()) - parseFloat($("#t_saldo").val())).toFixed(2); 
+							  		var t_total = parseFloat(parseFloat($("#t_interes").val()) + parseFloat($("#t_mora_real").val()) - parseFloat($("#t_saldo").val())).toFixed(2); 
 									$("#t_total").val(t_total);
 
 							  		return ("$ " + row["mora"]);	        						
@@ -186,22 +188,18 @@ date_default_timezone_set('America/Bogota');
 							{"data":"fecha_i"},
 							{"render":
 							  	function ( data, type, row ) {
-							  		var total2 = row["t_saldo"]; 
-									$("#t_saldo").val(total2);
-									//*****************************************************************
-							  		//Para llenar el campo total 
-							  		//*****************************************************************
 							  		var t_total = parseFloat(parseFloat($("#t_interes").val()) + parseFloat($("#t_mora").val()) - parseFloat($("#t_saldo").val())).toFixed(2); 
 									$("#t_total").val(t_total);
 
 							  		valor_p =  parseFloat(parseFloat(row["valor"]) - parseFloat(row["totalpagado"])).toFixed(2);
 							  		if (valor_p<=0)
 							  		{
+										$("#t_saldo").val("0");
 							  			return ("$ 0");
 							  		}
 							  		else
 							  		{	
-
+										$("#t_saldo").val(valor_p);
 							  			return ("$ "+valor_p);
 							  		}	        						
 							  	}
@@ -296,13 +294,13 @@ date_default_timezone_set('America/Bogota');
 						 	<td   style="font-size: 16px;font-weight: 1000;text-align: center">Cancelados</td>	
 						</tr>
 					</table>	
-					<table class="table-responsive"  id="tabla_cancelados" width="100%" style="font-family:sans-serif; font-size: 10px;text-align: center">
+					<table class="table-responsive"  id="tabla_cancelados" width="100%" style="font-family:sans-serif; font-size: 13px;text-align: center">
 						<thead>
 							<tr style="color:#FFFFFF; background-color: #2E86C1;">
 								<th width="25%">Fecha</th>
-								<th width="25%">Interes</th>
+								<th width="2%">Interes</th>
 								<th width="25%">Mora</th>
-								<th width="35%">M-Cobro</th>
+								<th width="25%">M-Cobro</th>
 							</tr>
 						</thead>
 					</table>
@@ -315,8 +313,14 @@ date_default_timezone_set('America/Bogota');
 
 							<tr>
 								<td style="width: 60%;font-size: 14px;font-weight: 1000;text-align: right;
-    								background-color: #BDC3C7"> ( + ) Total Mora cobrado: $</td>
+    								background-color: #BDC3C7"> ( + ) Total Mora : $</td>
 								<td style="width: 40%;background-color: #BDC3C7"><input type="text" readonly="true" id="t_mora" name="t_mora" required maxlength="45"style="font-size: 14px;font-weight: 1000;text-align: right; height: 30px;width: 100%;line-height: 20px" /></td>						
+							</tr>
+
+							<tr>
+								<td style="width: 60%;font-size: 14px;font-weight: 1000;text-align: right;
+    								background-color: #BDC3C7"> ( + ) Total Mora cobrada: $</td>
+								<td style="width: 40%;background-color: #BDC3C7"><input type="text" readonly="true" id="t_mora_real" name="t_mora_real" required maxlength="45"style="font-size: 14px;font-weight: 1000;text-align: right; height: 30px;width: 100%;line-height: 20px" /></td>						
 							</tr>
 
 							<tr style="height: 20px"></tr>
