@@ -108,7 +108,7 @@ date_default_timezone_set('America/Bogota');
 						},
 
 						"columns":[							
-							{"data":"id_cab_credito"},
+							//{"data":"id_cab_credito"},
 							{"data":"fecha_i"},
 							{"render":
 							  	function ( data, type, row ) {
@@ -135,9 +135,12 @@ date_default_timezone_set('America/Bogota');
 
 							  		return ("$ " + row["mora"]);	        						
 							  	}
-							}
-
-																		  											
+							},
+							{"render":
+							  	function ( data, type, row ) {
+							  		return ("$ " + row["mora_real"]);	        						
+							  	}
+							},
 						],			
 						"buttons": [
 				            
@@ -293,21 +296,13 @@ date_default_timezone_set('America/Bogota');
 						 	<td   style="font-size: 16px;font-weight: 1000;text-align: center">Cancelados</td>	
 						</tr>
 					</table>	
-					<table class="table-responsive"  id="tabla_cancelados" width="100%" style="font-family:sans-serif; font-size: 13px;text-align: center">
-						<colgroup>
-		       				<col style="width: 5%;">
-		       				<col style="width: 30%;">
-		       				<col style="width: 25%;">
-		       				<col style="width: 15%;">
-		       				
-		    			</colgroup>
+					<table class="table-responsive"  id="tabla_cancelados" width="100%" style="font-family:sans-serif; font-size: 10px;text-align: center">
 						<thead>
 							<tr style="color:#FFFFFF; background-color: #2E86C1;">
-								<th>#</th>
-								<th>Fecha</th>
-								<th>Interes</th>
-								<th>Mora</th>
-																					
+								<th width="25%">Fecha</th>
+								<th width="25%">Interes</th>
+								<th width="25%">Mora</th>
+								<th width="35%">M-Cobro</th>
 							</tr>
 						</thead>
 					</table>

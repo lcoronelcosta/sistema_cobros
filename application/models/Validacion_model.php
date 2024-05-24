@@ -662,7 +662,6 @@ class Validacion_model extends CI_Model {
 
 	}
 
-
 	public function abonar_al_credito($id_cobrador, $porcentaje_comision)
 	{
 		//$this->load->helper('url');      	    
@@ -689,11 +688,17 @@ class Validacion_model extends CI_Model {
 			    
 		$this->db->insert('abono', $dataabono);
 
-		$query1 = $this->db->query("SELECT concat('MORA: ',c.nombre, ' ', c.apellido) as nombre FROM cliente c, cab_credito cc where cc.id_cliente = c.id_cliente and cc.id_cab_credito = " . $id_cab_credito . " ");
+		$query1 = $this->db->query("SELECT concat('MORA: ',c.nombre, ' ', c.apellido) as nombre 
+			FROM cliente c, cab_credito cc 
+			where cc.id_cliente = c.id_cliente 
+				and cc.id_cab_credito = " . $id_cab_credito . " ");
+
 		$result1 = $query1->row_array();
 		$cliente = $result1['nombre'];
 
-		$query = $this->db->query("SELECT (cc.totalapagar-cc.totalpagado) as saldo, cc.interes, cc.mora FROM cab_credito cc where cc.id_cab_credito = " . $id_cab_credito . " ");
+		$query = $this->db->query("SELECT (cc.totalapagar-cc.totalpagado) as saldo, cc.interes, cc.mora 
+			FROM cab_credito cc 
+			where cc.id_cab_credito = " . $id_cab_credito . " ");
 
 		$result = $query->row_array();
 		$saldo_liquidar = $result['saldo'];
@@ -718,7 +723,7 @@ class Validacion_model extends CI_Model {
 			if ($liquidar == "true")
 			{
 						
-				$this->db->set('totalpagado','totalpagado +'. (float)$saldo_liquidar, FALSE);
+				//$this->db->set('totalpagado','totalpagado +'. (float)$saldo_liquidar, FALSE);
 				$this->db->set('estado',"cancelado");
 	      		$this->db->where('id_cab_credito', $id_cab_credito);
 	      		$this->db->update('cab_credito');
@@ -727,7 +732,7 @@ class Validacion_model extends CI_Model {
 				$band1 = $this->validacion_model->abonar_al_credito_detalle($id_cab_credito, $saldo_liquidar, $id_cobrador,$valor,false, $comision_mora_completo);
 
 				//****************************************************************
-				//Se guarda la liquidacion de la cuenta para el cuadre de caja
+				//Se guarda la liquidacion de la cuenta para el cuadre de caja (COMISION)
 				//del cobrador (debe / haber)
 				//****************************************************************
 					
@@ -1759,8 +1764,33 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/
-		$result = $this->db->query("SELECT CC.id_cab_credito, CC.fecha_i, CC.interes, CC.mora, (SELECT round(sum(CC1.interes),2) FROM cliente CI1, cab_credito CC1 WHERE CI1.id_cliente=CC1.id_cliente and CC1.id_cliente =". $id_cliente. " and CC1.estado='cancelado') as t_interes, (SELECT round(sum(CC1.mora),2) FROM cliente CI1, cab_credito CC1 WHERE CI1.id_cliente=CC1.id_cliente and CC1.id_cliente =". $id_cliente. " and CC1.estado='cancelado') as t_mora FROM cliente CI, cab_credito CC WHERE CI.id_cliente=CC.id_cliente and CC.id_cliente =". $id_cliente. " and estado='cancelado'");
-
+		//$result = $this->db->query("SELECT CC.id_cab_credito, CC.fecha_i, CC.interes, CC.mora, (SELECT round(sum(CC1.interes),2) FROM cliente CI1, cab_credito CC1 WHERE CI1.id_cliente=CC1.id_cliente and CC1.id_cliente =". $id_cliente. " and CC1.estado='cancelado') as t_interes, (SELECT round(sum(CC1.mora),2) FROM cliente CI1, cab_credito CC1 WHERE CI1.id_cliente=CC1.id_cliente and CC1.id_cliente =". $id_cliente. " and CC1.estado='cancelado') as t_mora FROM cliente CI, cab_credito CC WHERE CI.id_cliente=CC.id_cliente and CC.id_cliente =". $id_cliente. " and estado='cancelado'");
+		$result = $this->db->query("SELECT 
+			CC.id_cab_credito, 
+			CC.fecha_i, 
+			CC.interes, 
+			CC.mora, 
+			round(CC.totalpagado-(CC.totalapagar-CC.mora), 2) AS mora_real,
+			(SELECT round(sum(CC1.interes),2) 
+				FROM cliente CI1, cab_credito CC1 
+					WHERE CI1.id_cliente=CC1.id_cliente 
+					and CC1.id_cliente = $id_cliente
+					and CC1.estado='cancelado') as t_interes, 
+			(SELECT round(sum(CC1.mora),2) 
+				FROM cliente CI1, cab_credito CC1 
+					WHERE CI1.id_cliente=CC1.id_cliente 
+					and CC1.id_cliente = $id_cliente
+					and CC1.estado='cancelado') as t_mora,
+			(SELECT round(sum(CC1.totalpagado-(CC1.totalapagar-CC1.mora)),2) 
+				FROM cliente CI1, cab_credito CC1 
+					WHERE CI1.id_cliente=CC1.id_cliente 
+					and CC1.id_cliente = $id_cliente
+					and CC1.estado='cancelado') as t_mora_real
+			FROM cliente CI, cab_credito CC 
+				WHERE CI.id_cliente=CC.id_cliente 
+				and CC.id_cliente = $id_cliente
+				and estado='cancelado'
+			ORDER BY CC.fecha_i desc");
 		$arreglo = null;		
 		foreach ($result->result_array() as $row) {
 			$arreglo["data"][] = $row;
@@ -1786,7 +1816,23 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/
-		$result = $this->db->query("SELECT CC.id_cab_credito, CC.fecha_i, CC.valor, CC.interes, CC.mora, CC.totalpagado, CC.totalapagar, (SELECT round(sum(CC1.totalapagar - CC1.totalpagado),2) FROM cliente CI1, cab_credito CC1 WHERE CI1.id_cliente=CC1.id_cliente and CC1.id_cliente =". $id_cliente. " and CC1.estado='pendiente') as t_saldo FROM cliente CI, cab_credito CC WHERE CI.id_cliente=CC.id_cliente and CC.id_cliente =". $id_cliente. " and estado='pendiente'");
+		$result = $this->db->query("SELECT 
+			CC.id_cab_credito, 
+			CC.fecha_i, 
+			CC.valor, 
+			CC.interes, 
+			CC.mora, 
+			CC.totalpagado, 
+			CC.totalapagar, 
+			(SELECT round(sum(CC1.totalapagar - CC1.totalpagado),2) 
+				FROM cliente CI1, cab_credito CC1 
+				WHERE CI1.id_cliente=CC1.id_cliente 
+					and CC1.id_cliente =$id_cliente
+					and CC1.estado='pendiente') as t_saldo 
+			FROM cliente CI, cab_credito CC 
+				WHERE CI.id_cliente=CC.id_cliente 
+				and CC.id_cliente = $id_cliente 
+				and estado='pendiente'");
 
 		$arreglo = null;		
 		foreach ($result->result_array() as $row) {
