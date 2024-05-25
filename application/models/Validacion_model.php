@@ -1824,6 +1824,11 @@ class Validacion_model extends CI_Model {
 			CC.mora, 
 			CC.totalpagado, 
 			CC.totalapagar, 
+			(SELECT round(sum(CC1.valor - CC1.totalpagado),2) 
+				FROM cliente CI1, cab_credito CC1 
+				WHERE CI1.id_cliente=CC1.id_cliente 
+					and CC1.id_cliente =$id_cliente
+					and CC1.estado='pendiente') as t_saldo_capital,
 			(SELECT round(sum(CC1.totalapagar - CC1.totalpagado),2) 
 				FROM cliente CI1, cab_credito CC1 
 				WHERE CI1.id_cliente=CC1.id_cliente 

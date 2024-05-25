@@ -192,16 +192,15 @@ date_default_timezone_set('America/Bogota');
 									$("#t_total").val(t_total);
 
 							  		valor_p =  parseFloat(parseFloat(row["valor"]) - parseFloat(row["totalpagado"])).toFixed(2);
-							  		if (valor_p<=0)
+									$("#t_saldo").val(row['t_saldo_capital']);       						
+									if (valor_p<=0)
 							  		{
-										$("#t_saldo").val("0");
 							  			return ("$ 0");
 							  		}
 							  		else
 							  		{	
-										$("#t_saldo").val(valor_p);
 							  			return ("$ "+valor_p);
-							  		}	        						
+							  		}	 
 							  	}
 							},
 							{"render":
@@ -321,6 +320,12 @@ date_default_timezone_set('America/Bogota');
 								<td style="width: 60%;font-size: 14px;font-weight: 1000;text-align: right;
     								background-color: #BDC3C7"> ( + ) Total Mora cobrada: $</td>
 								<td style="width: 40%;background-color: #BDC3C7"><input type="text" readonly="true" id="t_mora_real" name="t_mora_real" required maxlength="45"style="font-size: 14px;font-weight: 1000;text-align: right; height: 30px;width: 100%;line-height: 20px" /></td>						
+							</tr>
+
+							<tr>
+								<td style="width: 60%;font-size: 14px;font-weight: 1000;text-align: right;
+    								background-color: #BDC3C7"> ( + ) Total Efectivo: $</td>
+								<td style="width: 40%;background-color: #BDC3C7"><input type="text" readonly="true" id="t_efectivo" name="t_efectivo" required maxlength="45"style="font-size: 14px;font-weight: 1000;text-align: right; height: 30px;width: 100%;line-height: 20px" /></td>						
 							</tr>
 
 							<tr style="height: 20px"></tr>
