@@ -193,11 +193,11 @@ date_default_timezone_set('America/Bogota');
 							{"data":"fecha_i"},
 							{"render":
 							  	function ( data, type, row ) {
-							  		var t_total = parseFloat(parseFloat($("#t_interes").val()) + parseFloat($("#t_mora").val()) - parseFloat($("#t_saldo").val())).toFixed(2); 
-									$("#t_total").val(t_total);
-
 							  		valor_p =  parseFloat(parseFloat(row["valor"]) - parseFloat(row["totalpagado"])).toFixed(2);
-									$("#t_saldo").val(row['t_saldo_capital']);       						
+									$("#t_saldo").val(row['t_saldo_capital']);   
+									
+									var t_total = parseFloat(parseFloat($("#t_interes").val()) + parseFloat($("#t_mora_real").val()) - parseFloat(row['t_saldo_capital'])).toFixed(2); 
+									$("#t_total").val(t_total);
 									if (valor_p<=0)
 							  		{
 							  			return ("$ 0");
