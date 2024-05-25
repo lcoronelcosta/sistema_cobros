@@ -70,9 +70,11 @@ date_default_timezone_set('America/Bogota');
  			$("#t_interes").val(0);
  			$("#t_saldo").val(0);
  			$("#t_total").val(0);
+			$("#t_mora_real").val(0);
+			$("#t_efectivo").val(0);
  			listar_cancelados();
  			listar_pendientes();
- 		});
+		});
 	
 	    var listar_cancelados = function()
 		{
@@ -134,6 +136,9 @@ date_default_timezone_set('America/Bogota');
 							  		//*****************************************************************
 							  		var t_total = parseFloat(parseFloat($("#t_interes").val()) + parseFloat($("#t_mora_real").val()) - parseFloat($("#t_saldo").val())).toFixed(2); 
 									$("#t_total").val(t_total);
+
+									var t_efectivo = parseFloat(parseFloat($("#t_interes").val()) + parseFloat($("#t_mora_real").val())).toFixed(2); 
+									$("#t_efectivo").val(t_efectivo);
 
 							  		return ("$ " + row["mora"]);	        						
 							  	}
@@ -259,9 +264,8 @@ date_default_timezone_set('America/Bogota');
 						"buttons": [
 				            
 				        ]
-					});				
-		}	    				    			
-		
+					});			
+		}	    		
 	</script>
 
 </head>
@@ -312,7 +316,7 @@ date_default_timezone_set('America/Bogota');
 
 							<tr>
 								<td style="width: 60%;font-size: 14px;font-weight: 1000;text-align: right;
-    								background-color: #BDC3C7"> ( + ) Total Mora : $</td>
+    								background-color: #BDC3C7"> Total Mora : $</td>
 								<td style="width: 40%;background-color: #BDC3C7"><input type="text" readonly="true" id="t_mora" name="t_mora" required maxlength="45"style="font-size: 14px;font-weight: 1000;text-align: right; height: 30px;width: 100%;line-height: 20px" /></td>						
 							</tr>
 
@@ -324,7 +328,7 @@ date_default_timezone_set('America/Bogota');
 
 							<tr>
 								<td style="width: 60%;font-size: 14px;font-weight: 1000;text-align: right;
-    								background-color: #BDC3C7"> ( + ) Total Efectivo: $</td>
+    								background-color: #BDC3C7"> ( = ) Total Efectivo: $</td>
 								<td style="width: 40%;background-color: #BDC3C7"><input type="text" readonly="true" id="t_efectivo" name="t_efectivo" required maxlength="45"style="font-size: 14px;font-weight: 1000;text-align: right; height: 30px;width: 100%;line-height: 20px" /></td>						
 							</tr>
 
