@@ -622,8 +622,29 @@ class Validacion_model extends CI_Model {
 	{
 		
 		$result = $this->db->query("SELECT cc.id_cab_credito,dc.id_det_credito, c.cedula, c.nombre, c.apellido, c.telefono, cc.fecha_i, cc.fecha_f,cc.totalapagar,dc.v_cuota,cc.totalpagado,cc.mora, (select dc1.fechapago from det_credito dc1 where dc1.id_det_credito = dc.id_det_credito + 1 and dc1.id_cab_credito = cc.id_cab_credito) as proxima_fecha, (select sum(dc2.v_cuota - dc2.abono) from det_credito dc2 where dc2.id_cab_credito= cc.id_cab_credito and dc2.estado='pendiente' and dc2.fechapago<'" . date("Y/m/d") ."') as cuotas_atrasadas FROM det_credito dc, cliente c, cab_credito cc WHERE dc.id_det_credito = " . $id_det_credito . " and dc.id_cab_credito = cc.id_cab_credito and cc.id_cliente = c.id_cliente");
-
 		return $result;
+
+	}
+
+	public function consulta_detalle_credito_por_abono($id_abono)
+	{
+		
+		$result = $this->db->query("SELECT 
+			cc.id_cab_credito, 
+			c.cedula,  
+			CONCAT(c.nombre, ' ', c.apellido) as nombre_completo,
+			c.celular,
+			cc.fecha_i,
+			cc.fecha_f,
+			cc.totalapagar,
+			cc.totalpagado,
+			cc.mora,
+			a.valor
+			FROM cab_credito AS cc
+			INNER JOIN abono AS a ON a.id_cab_credito = cc.id_cab_credito
+			INNER JOIN cliente AS c ON c.id_cliente = cc.id_cliente
+			WHERE a.id_abono = $id_abono");
+		return $result->row_array();
 
 	}
 

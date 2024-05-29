@@ -152,6 +152,12 @@ class Menu_principal extends CI_Controller {
 		$this->load->view('abono',$array);	
 	}
 
+	public function abono_edit()
+	{
+		$array = $this->session->userdata('detalle_credito');		
+		$this->load->view('abono_edit',$array);	
+	}
+
 	public function abonos_realizados()
 	{
 		$array = $this->session->userdata('detalle_credito');		

@@ -19,6 +19,10 @@ date_default_timezone_set('America/Bogota');
     <script type="text/javascript" src="<?php echo base_url(); ?>js/dataTables.buttons.min.js"></script>
 	<script type="text/javascript" src="<?php echo base_url(); ?>js/dataTables.select.min.js"></script>
 
+	
+	<!-- Negocio -->
+	<script type="text/javascript" src="<?php echo base_url(); ?>js/admin/abonos.js"></script>
+
  	<script type="text/javascript">
 
 
@@ -491,7 +495,24 @@ date_default_timezone_set('America/Bogota');
 									$("#t_liquidacion").val(total_liquidar);
 							  		return ("$ " + row["valor"]);	        						
 							  	}
+							},
+							{"render":
+							function ( data, type, row ) {
+								return (`
+								<div>
+									<form action="<?= base_url() .'index.php/validacion/abono'?>" method="post" class="" onsubmit="target_popup(this)">
+										<tr>	
+											<td align="center">
+												<button type="submit" class="btn btn-outline-dark btn-sm">
+													<i class="fa fa-pencil" aria-hidden="true"></i>
+												</button>
+											</td>
+											<td><input type="text" style="display: none;" value="${row["id_abono"]}" name="id_abono" id="id_abono"></td>
+										</tr>	                
+									</form>
+								</div>`);
 							}
+						},
 													  											
 						],			
 						"buttons": [
@@ -666,9 +687,10 @@ date_default_timezone_set('America/Bogota');
 		                <table id="tabla_abono" width="100%" style="font-family:sans-serif; font-size: 13px;text-align: center">
 								<colgroup>
 									<col style="width: 10%;">
-				       				<col style="width: 30%;">
-				       				<col style="width: 30%;">
-				       				<col style="width: 30%;">
+				       				<col style="width: 25%;">
+				       				<col style="width: 25%;">
+				       				<col style="width: 25%;">
+									<col style="width: 15%;">
 				       								       				
 				    			</colgroup>
 								<thead>
@@ -676,7 +698,8 @@ date_default_timezone_set('America/Bogota');
 										<th>Id</th>
 										<th>Fecha</th>
 										<th>Cliente</th>
-										<th>Valor</th>												
+										<th>Valor</th>	
+										<th></th>												
 									</tr>
 								</thead>
 						</table>

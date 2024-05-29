@@ -460,10 +460,17 @@ class Validacion extends CI_Controller {
 	public function abono()
 	{
 		$this->load->model('validacion_model');
-		$query =$this->validacion_model->consulta_detalle_credito($_POST['id_detalle_credito']);
-		$detalle_credito = $query->row_array(); //El resultado del Query lo convierto en un Array.				
-		$this->session->set_userdata('detalle_credito',$detalle_credito);
-		redirect(base_url().'index.php/menu_principal/abono');
+		if(isset($_POST['id_abono'])){
+			$detalle_credito =$this->validacion_model->consulta_detalle_credito_por_abono($_POST['id_abono']);
+			$this->session->set_userdata('detalle_credito',$detalle_credito);
+			redirect(base_url().'index.php/menu_principal/abono_edit');
+		}else{
+			$query =$this->validacion_model->consulta_detalle_credito($_POST['id_detalle_credito']);
+			$detalle_credito = $query->row_array(); //El resultado del Query lo convierto en un Array.				
+			$this->session->set_userdata('detalle_credito',$detalle_credito);
+			redirect(base_url().'index.php/menu_principal/abono');
+		}
+		
 	}
 
 	public function mostrar_abonos()
