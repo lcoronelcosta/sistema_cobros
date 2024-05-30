@@ -89,7 +89,7 @@ date_default_timezone_set('America/Bogota');
 					//*****************************************************************
 					//Obtengo cual el ID que está en la primera columna del DataTable
 					//*****************************************************************
-					var id = $(this).find("td:eq(0)").text();
+					var id = $(this).find("td:eq(4)").text();
 					$.post("<?= base_url() .'index.php/validacion/cuadre_comision'?>",
 			        {
 			          id_liquidacion: id
@@ -111,7 +111,7 @@ date_default_timezone_set('America/Bogota');
 					//*****************************************************************
 					//Obtengo cual el ID que está en la primera columna del DataTable
 					//*****************************************************************
-					var id = $(this).find("td:eq(0)").text();
+					var id = $(this).find("td:eq(4)").text();
 					$.post("<?= base_url() .'index.php/validacion/cuadre_faltante_sobrante'?>",
 			        {
 			          id_liquidacion: id
@@ -133,7 +133,7 @@ date_default_timezone_set('America/Bogota');
 					//*****************************************************************
 					//Obtengo cual el ID que está en la primera columna del DataTable
 					//*****************************************************************
-					var id = $(this).find("td:eq(0)").text();
+					var id = $(this).find("td:eq(3)").text();
 					$.post("<?= base_url() .'index.php/validacion/cuadre_gastos'?>",
 			        {
 			          id_gasto: id
@@ -246,7 +246,6 @@ date_default_timezone_set('America/Bogota');
 						},
 
 						"columns":[							
-							{"data":"id_gasto"},
 							{"data":"fecha_gasto"},
 							{"data":"detalle"},
 							{"render":
@@ -263,7 +262,8 @@ date_default_timezone_set('America/Bogota');
 									return ("$ " + row["valor"]);	
 										
 							  	}
-							}									
+							},
+							{"data":"id_gasto"},									
 						],			
 						"buttons": [
 				            
@@ -307,7 +307,6 @@ date_default_timezone_set('America/Bogota');
 						},
 
 						"columns":[							
-							{"data":"id_liquidacion"},
 							{"data":"fecha"},
 							{"render":
 								function ( data, type, row ) {
@@ -331,7 +330,8 @@ date_default_timezone_set('America/Bogota');
 								function ( data, type, row ) {
 							  		return ("$ " + row["valor"]);	        						
 							  	}
-							}					  											
+							},
+							{"data":"id_liquidacion"},					  											
 						],			
 						"buttons": [
 				            
@@ -375,7 +375,6 @@ date_default_timezone_set('America/Bogota');
 						},
 
 						"columns":[							
-							{"data":"id_liquidacion"},
 							{"data":"fecha"},
 							{"render":
 								function ( data, type, row ) {
@@ -396,8 +395,8 @@ date_default_timezone_set('America/Bogota');
 									$("#t_liquidacion").val(total_liquidar);
 							  		return ("$ " + row["valor"]);	        						
 							  	}
-							}
-													  											
+							},
+							{"data":"id_liquidacion"},
 						],			
 						"buttons": [
 				            
@@ -468,19 +467,19 @@ date_default_timezone_set('America/Bogota');
 
 		                <table id="tabla_comision" width="100%" style="font-family:sans-serif; font-size: 13px;">
 								<colgroup>
-									<col style="width: 10%;">
 									<col style="width: 20%;">
 				       				<col style="width: 40%;">
 				       				<col style="width: 15%;">
-				       				<col style="width: 15%;">				       				
+				       				<col style="width: 15%;">
+									<col style="width: 10%;">				       				
 				    			</colgroup>
 								<thead>
 									<tr style="color:#FFFFFF; background-color: #2E86C1;">
-										<th>Id</th>
 										<th>Fecha</th>
 										<th>Nombre</th>
 										<th>Interes</th>
-										<th>Com</th>													
+										<th>Com</th>
+										<th>Id</th>													
 									</tr>
 								</thead>
 						</table>
@@ -501,20 +500,20 @@ date_default_timezone_set('America/Bogota');
 						 </table>	
 		                <table id="tabla_faltante_sobrante" width="100%" style="font-family:sans-serif; font-size: 13px;">
 								<colgroup>
-									<col style="width: 10%;">
 				       				<col style="width: 20%;">
 				       				<col style="width: 30%;">
 				       				<col style="width: 20%;">
 				       				<col style="width: 15%;">
+									<col style="width: 10%;">
 				       				
 				    			</colgroup>
 								<thead>
 									<tr style="color:#FFFFFF; background-color: #2E86C1;">
-										<th>Id</th>
 										<th>Fecha</th>
 										<th>Nombres</th>
 										<th>Descripción</th>
-										<th>Valor</th>												
+										<th>Valor</th>	
+										<th>Id</th>											
 									</tr>
 								</thead>
 						</table>
@@ -536,18 +535,17 @@ date_default_timezone_set('America/Bogota');
 						 </table>		
 		                <table id="tabla_gastos" width="100%" style="font-family:sans-serif; font-size: 13px;">
 								<colgroup>
-									<col style="width: 10%;">
 				       				<col style="width: 30%;">
 				       				<col style="width: 30%;">
 				       				<col style="width: 10%;">				       				
-				       				
+									<col style="width: 10%;">
 				    			</colgroup>
 								<thead>
 									<tr style="color:#FFFFFF; background-color: #2E86C1;">
-										<th>Id</th>
 										<th>Fecha Gasto</th>
 										<th>Detalle</th>
 										<th>Valor</th>	
+										<th>Id</th>
 									</tr>
 								</thead>
 						</table>
