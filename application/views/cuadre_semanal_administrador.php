@@ -471,16 +471,16 @@ date_default_timezone_set('America/Bogota');
 									<col style="width: 10%;">
 									<col style="width: 20%;">
 				       				<col style="width: 40%;">
-				       				<col style="width: 20%;">
-				       				<col style="width: 20%;">				       				
+				       				<col style="width: 15%;">
+				       				<col style="width: 15%;">				       				
 				    			</colgroup>
 								<thead>
 									<tr style="color:#FFFFFF; background-color: #2E86C1;">
 										<th>Id</th>
 										<th>Fecha</th>
-										<th>Nombres</th>
+										<th>Nombre</th>
 										<th>Interes</th>
-										<th>Comisión</th>													
+										<th>Com</th>													
 									</tr>
 								</thead>
 						</table>
