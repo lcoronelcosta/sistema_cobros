@@ -54,7 +54,6 @@ date_default_timezone_set('America/Bogota');
 						async:false,
 						success:function(result)
 						{			
-							alert(result);		
 							alert("Abono ingresado correctamente.");
 							var botonPadre = window.opener.document.getElementById("button_consultar");
 							botonPadre.click();
