@@ -16,18 +16,75 @@ date_default_timezone_set('America/Bogota');
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>css/jquery.dataTables.min.css">
     <script src="<?php echo base_url(); ?>js/jquery.js"></script>
 	
-	<!-- Negocio -->
-	<script type="text/javascript" src="<?php echo base_url(); ?>js/admin/abonos.js"></script>
+	
 
 
     <style type="text/css">
     	#cabecera { height: 200px; }
 	</style>
 
+	<script>
+		function target_popup(form) {
+			window.open('', 'formpopup', 'width=400,height=400,resizeable,scrollbars');
+			form.target = 'formpopup';
+		}
+
+		function guardar(url)
+		{
+			let abono = $('#abono').val();
+			let abonoModify = ($('#abono_modify').val() == "") ? "$0" : $('#abono_modify').val();
+			if(abonoModify != "$0"){
+				if (confirm(`Esta seguro que desea cambiar el valor del abono de ${abono} por ${abonoModify} al credito`))
+				{      
+					document.getElementById("btn_guardar").style.display='none';
+					var formData = new FormData();
+					formData.append("id_cab_credito",$("#id_cab_credito").val());
+					formData.append("id_abono",$("#id_abono").val());
+					formData.append("valor_abono_edit",$("#abono").val());
+					formData.append("valor_abono",$("#abono_modify").val());
+					formData.append("edit",true);
+
+					$.ajax({
+						url:url,
+						type:'POST',						
+						data: formData,
+						cache: false,
+						contentType: false,
+						processData: false,
+						async:false,
+						success:function(result)
+						{			
+							alert(result);		
+							alert("Abono ingresado correctamente.");
+							var botonPadre = window.opener.document.getElementById("button_consultar");
+							botonPadre.click();
+							window.close();
+							
+						},
+						error:function(result)
+						{					
+							alert("Error al grabar el abono. Favor intentar de nuevo.");
+							window.close();	
+						}					
+					});	
+				}
+				else
+				{
+					window.close();
+				}
+			}else{
+				alert("El valor del abono no puede ser 0")
+			}
+
+			
+		}
+	</script>
+
 
 </head>
 
 <body  class="body_alterno">
+	<input type="hidden" id="id_abono" name="id_abono" value="<?php echo $id_abono  ?>" >
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 offset-md-3 myform-cont" >				
@@ -85,7 +142,7 @@ date_default_timezone_set('America/Bogota');
 					<table width="100%">
 				
 					<tr>
-							<td align="center"><input type="submit" id="btn_guardar" name="btn_abonar"class="btn-sm" style="background-color: #C8216A;color: #FFFFFF;width: 98%;" value="Guardar" onclick="guardar()"/></td>
+							<td align="center"><input type="submit" id="btn_guardar" name="btn_abonar"class="btn-sm" style="background-color: #C8216A;color: #FFFFFF;width: 98%;" value="Guardar" onclick="guardar('<?php echo base_url(); ?>index.php/validacion/abonar_al_credito')"/></td>
 					</form>
 					<form action="" method="" class="">		
 							<td align="center"><input type="submit" id="btn_regresar" name="btn_regresar"class="btn-sm" style="background-color: #C8216A;color: #FFFFFF;width: 98%;" value="Regresar" onclick="window.close();"/></td>

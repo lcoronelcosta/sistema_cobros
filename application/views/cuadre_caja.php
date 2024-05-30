@@ -631,7 +631,7 @@ date_default_timezone_set('America/Bogota');
 					<table style="width: 100%">
 						<tr>
 							
-							<td><input type="submit" class="btn-sm" style="background-color: #C8216A;color: #FFFFFF;width: 95%" value="Consultar" onclick="consultar_cuadre_caja()"/></td>
+							<td><button id="button_consultar" type="submit" class="btn-sm" style="background-color: #C8216A;color: #FFFFFF;width: 95%" value="Consultar" onclick="consultar_cuadre_caja()">Consultar</button></td>
 							<form action="<?= base_url() .'index.php/menu_principal/menu_reporte'?>" method="post" class="">		
 									<td ><input type="submit" id="btn_regresar" name="btn_regresar"class="btn-sm" style="width: 95%;background-color: #C8216A;color: #FFFFFF;" value="Regresar"/></td>
 							</form>

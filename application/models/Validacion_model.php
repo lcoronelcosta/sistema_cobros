@@ -630,6 +630,7 @@ class Validacion_model extends CI_Model {
 	{
 		
 		$result = $this->db->query("SELECT 
+			a.id_abono,
 			cc.id_cab_credito, 
 			c.cedula,  
 			CONCAT(c.nombre, ' ', c.apellido) as nombre_completo,
@@ -683,13 +684,51 @@ class Validacion_model extends CI_Model {
 
 	}
 
+	public function deleteAbono($id_abono, $id_cab_credito){
+		$result = $this->db->query("SELECT fecha, valor FROM abono WHERE id_abono = $id_abono");
+		$data = $result->row_array();
+		$pagoOld = $data['valor'];
+		$fecha = $data['fecha'];
+
+		$this->db->query("DELETE FROM abono WHERE id_abono = $id_abono");
+		$this->db->query("UPDATE cab_credito SET totalpagado = (totalpagado-$pagoOld), estado = 'pendiente' WHERE id_cab_credito = $id_cab_credito");
+		$this->db->query("DELETE FROM liquidacion WHERE id_cab_credito = $id_cab_credito");
+
+		$query = $this->db->query("SELECT * FROM det_credito where id_cab_credito = $id_cab_credito AND abono > 0 ORDER BY id_det_credito DESC");
+		foreach ($query->result_array() as $row) {
+			$abonoActual = round($row["abono"],2);
+			$pagoOld = $pagoOld - $abonoActual;
+			log_message("error", 'pagoOld :'.$pagoOld);
+
+			if($pagoOld > 0){
+				$this->db->query("UPDATE det_credito SET abono = 0, estado = 'pendiente', fecha = NULL WHERE id_det_credito = ".$row['id_det_credito']);
+			}else if($pagoOld <= 0){
+				$pago = abs($pagoOld);
+				$estado = ($pago < round($row["v_cuota"],2)) ? 'pendiente' : 'cancelado';
+				log_message("error", 'pago: '.$pago);
+				$this->db->query("UPDATE det_credito SET abono = $pago, estado = '".$estado."' WHERE id_det_credito = ".$row['id_det_credito']);
+				break;
+			}
+		}
+		return $fecha;
+	}
+
 	public function abonar_al_credito($id_cobrador, $porcentaje_comision)
 	{
-		//$this->load->helper('url');      	    
+		$edit = $this->input->post('edit');
 		$id_cab_credito = $this->input->post('id_cab_credito');
+		$fecha = date("Y/m/d");
+		if($edit == "true"){
+			$valor_abono = $this->input->post('valor_abono');
+			$id_abono = $this->input->post('id_abono');
+			$result = $this->db->query("SELECT fecha, valor FROM abono WHERE id_abono = $id_abono");
+			$fecha = $this->deleteAbono($id_abono, $id_cab_credito);
+		}
+
+		//$this->load->helper('url');      	    
 		$id_det_credito = $this->input->post('id_det_credito');
 		$valor_abono = $this->input->post('valor_abono');
-		$liquidar = $this->input->post('liquidar');
+		$liquidar = !is_null($this->input->post('liquidar')) ? $this->input->post('liquidar') : false;
 
       	$this->db->set('totalpagado','totalpagado +'. (float)$valor_abono, FALSE);
       	$this->db->where('id_cab_credito', $id_cab_credito);
@@ -702,7 +741,7 @@ class Validacion_model extends CI_Model {
       	$dataabono = array(                          
          'id_cab_credito' => $id_cab_credito,
          'valor' => $valor_abono,
-         'fecha' => date("Y/m/d"),
+         'fecha' => $fecha,
          'id_usuario' => $id_cobrador
          
       	);

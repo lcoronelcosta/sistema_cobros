@@ -54,6 +54,7 @@ date_default_timezone_set('America/Bogota');
 		function cierra_ventana(){
 			window.close();
 		}
+		
  		function cambiar(){
 		    var pdrs = document.getElementById('user_file').files[0].name;
 		    document.getElementById('info').innerHTML = pdrs;
@@ -275,6 +276,7 @@ date_default_timezone_set('America/Bogota');
     		    formData.append("id_det_credito",$("#id_det_credito").val());
     		    formData.append("valor_abono",$("#abono").val());
     		    formData.append("liquidar",$chequeado);
+				formData.append("edit",false);
     
     			$.ajax({
     				url:"<?php echo base_url(); ?>index.php/validacion/abonar_al_credito",
