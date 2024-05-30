@@ -698,14 +698,12 @@ class Validacion_model extends CI_Model {
 		foreach ($query->result_array() as $row) {
 			$abonoActual = round($row["abono"],2);
 			$pagoOld = $pagoOld - $abonoActual;
-			log_message("error", 'pagoOld :'.$pagoOld);
 
 			if($pagoOld > 0){
-				$this->db->query("UPDATE det_credito SET abono = 0, estado = 'pendiente', fecha = NULL WHERE id_det_credito = ".$row['id_det_credito']);
+				$this->db->query("UPDATE det_credito SET abono = 0, estado = 'pendiente', fechaabono = NULL WHERE id_det_credito = ".$row['id_det_credito']);
 			}else if($pagoOld <= 0){
 				$pago = abs($pagoOld);
 				$estado = ($pago < round($row["v_cuota"],2)) ? 'pendiente' : 'cancelado';
-				log_message("error", 'pago: '.$pago);
 				$this->db->query("UPDATE det_credito SET abono = $pago, estado = '".$estado."' WHERE id_det_credito = ".$row['id_det_credito']);
 				break;
 			}
