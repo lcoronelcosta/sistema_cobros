@@ -264,8 +264,6 @@ date_default_timezone_set('America/Bogota');?>
 			}else{
 				event.stopPropagation();
 			}
-
-			
 		});
 
 
@@ -291,6 +289,7 @@ date_default_timezone_set('America/Bogota');?>
 		            	alert("Fecha reprogramada con éxito.");
 						document.getElementById("btn_abonar").disabled = true;
 	            		document.getElementById("btn_abonar").style.opacity = "0.5";
+						cierraPopup();
 		            	
 		            }
 		            else
@@ -351,6 +350,12 @@ date_default_timezone_set('America/Bogota');?>
 		sumarColumna();
 
 		console.log(path)
+
+		function cierraPopup() {
+			$("#myModal").modal('hide');//ocultamos el modal
+			$('body').removeClass('modal-open');//eliminamos la clase del body para poder hacer scroll
+			$('.modal-backdrop').remove();//eliminamos el backdrop del modal
+		}
 		
 
 
