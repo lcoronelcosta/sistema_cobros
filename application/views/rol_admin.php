@@ -254,10 +254,24 @@ date_default_timezone_set('America/Bogota');?>
 			});			
 		});
 
+		// Evita que se deseleccione la fila al dar click en los botones
+		$('#tabla_cobros').on('click', '.reprogramar', function(event){
+			var fila = $(this).closest('tr'); 
+			if (!fila.hasClass('selected')) {
+				// Si la fila no está seleccionada, seleccionarla
+				$('#tabla_cobros tr').removeClass('selected');
+				fila.addClass('selected');
+			}else{
+				event.stopPropagation();
+			}
+
+			
+		});
+
 
 		$("#guardar").click(function(){
 		        //alert ($("#id_detalle_credito").val())
-
+			
 		        
 		    var hoy= new Date().toJSON().slice(0,10);
 		    if ($("#fecha_r").val()<hoy)
@@ -275,8 +289,6 @@ date_default_timezone_set('America/Bogota');?>
 		            if (data == "1")
 		            {
 		            	alert("Fecha reprogramada con éxito.");
-		            	path="<?php echo base_url(); ?>index.php/validacion/consulta_clientes_cobrar";
-		   				listar($("#fecha_i").val());
 						document.getElementById("btn_abonar").disabled = true;
 	            		document.getElementById("btn_abonar").style.opacity = "0.5";
 		            	
@@ -284,8 +296,6 @@ date_default_timezone_set('America/Bogota');?>
 		            else
 		            {
 		            	alert("La fecha no ha sido reprogramada. Favor intente nuevamente.");
-		            	path="<?php echo base_url(); ?>index.php/validacion/consulta_clientes_cobrar";
-		   				listar($("#fecha_i").val());
 						document.getElementById("btn_abonar").disabled = true;
 	            		document.getElementById("btn_abonar").style.opacity = "0.5";
 		            }
@@ -587,7 +597,7 @@ date_default_timezone_set('America/Bogota');?>
 								//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
 								return (`
 								<div>
-									<button class='form btn btn-lg' style='background-color:transparent;'> 
+									<button class='form btn btn-lg reprogramar' style='background-color:transparent;'> 
 										<div style='text-align:center; color:black;'>
 											<i class="fa fa-registered" aria-hidden="true"></i>
 										</div>
