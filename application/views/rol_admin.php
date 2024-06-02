@@ -536,6 +536,10 @@ date_default_timezone_set('America/Bogota');?>
 						if(celular.length == 10){
 							celular = '593'+celular.substring(1);
 						}
+						var dropdowns = document.querySelectorAll('.dropdown');
+						dropdowns.forEach(function(dropdown) {
+							dropdown.removeAttribute('open');
+						});
 						let url = 'https://api.whatsapp.com/send?phone=+'+celular+'&text='+resutlData.data;
 						//window.open(url, '_blank');
 						location.href = url;
