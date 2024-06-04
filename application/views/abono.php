@@ -391,7 +391,7 @@ date_default_timezone_set('America/Bogota');
 					<form name="fs" action="<?= base_url() .'index.php/menu_principal/inicio'?>" method="post" class="" onsubmit="if (document.abono.value!='') {return true;} else {return false;}">
 					<tr>
 							<td>Abono: </td>
-							<td><input type="text" id="abono" name="abono" onkeypress="return numeros(event)" required maxlength="10" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
+							<td><input type="number" id="abono" name="abono" onkeypress="return numeros(event)" required maxlength="10" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
 					</tr>
 					<tr style="height: 20px;"></tr>
 					<tr>

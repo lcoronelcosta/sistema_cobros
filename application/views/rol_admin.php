@@ -30,6 +30,12 @@ date_default_timezone_set('America/Bogota');?>
 	<!-- CDN Sweet alert-->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+	<style>
+		.data{
+			margin: auto;
+		}
+	</style>
+
 </head>	
 <body  class="body_alterno">
 	<div class="container formulario">
@@ -176,11 +182,10 @@ date_default_timezone_set('America/Bogota');?>
 				</div>
 
 
-                    <table class="table-responsive" id="tabla_cobros" width="100%" style="font-family:sans-serif; font-size: 10px;">
+                    <table class="cell-border" id="tabla_cobros" width="100%" style="font-family:sans-serif; font-size: 10px;">
 						<colgroup>
 		       				<col style="width: 10%;">
 		       				<col style="width: 40%;">
-		       				<col style="width: 10%;">
 		       				<col style="width: 10%;">
 		       				<col style="width: 10%;">
 		       				<col style="width: 10%;">
@@ -194,8 +199,6 @@ date_default_timezone_set('America/Bogota');?>
 								<th>Mora</th>						
 								<th>Saldo</th>
 								<th>Id</th>
-								<th>Opción</th>
-								<th></th>
 							</tr>
 						</thead>
 					</table>
@@ -596,34 +599,23 @@ date_default_timezone_set('America/Bogota');?>
 								return (moment(String(row["fecha_i"])).format('YYMMDD'))    				         					
 							}
 						},
-						{"data":"nombre_completo"},
-						{"data": "cuota_pendiente"},
-						{"data": "mora_pendiente"},
-						{"data": "saldo_total"},
-						{"data":"id_det_credito"},
-						{"render":
-							function ( data, type, row ) {
-								//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
-								return (`
-								<div>
-									<button class='form btn btn-lg reprogramar' style='background-color:transparent;'> 
+						//{"data":"nombre_completo"},
+						{"render": 
+							function (data, type, row){
+								return(`
+								<p class="data">${row["nombre_completo"]}</p>
+								<div class="row">
+									<button class='form btn btn-lg reprogramar col-sm-3' style='background-color:transparent;'> 
 										<div style='text-align:center; color:black;'>
 											<i class="fa fa-registered" aria-hidden="true"></i>
 										</div>
 									</button>
-									<button class='btn btn-lg' style='background-color:transparent;' onclick='acuerdoDePago("${row["celular"]}")'> 
+									<button class='btn btn-lg col-sm-3' style='background-color:transparent;'> 
 										<div style='text-align:center; color:green;'>
 											<i class='fa fa-whatsapp'></i>
 										</div>
 									</button>
-								</div>`);
-							}
-						},
-						{"render":
-							function ( data, type, row ) {
-								//return (parseFloat(parseFloat(row["totalapagar"]) - parseFloat(row["totalpagado"])).toFixed(2));
-								return (`
-								<details class="dropdown">
+									<details class="dropdown" style="padding-left:20%; padding-top: 5%">
 									<summary role="button">
 										<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
 									</summary>
@@ -644,9 +636,16 @@ date_default_timezone_set('America/Bogota');?>
 										</li>
 									</ul>
 								</details>
-								`);
+								</div>
+								
+								`)
 							}
-						}
+						},
+						{"data": "cuota_pendiente"},
+						{"data": "mora_pendiente"},
+						{"data": "saldo_total"},
+						{"data":"id_det_credito"}
+						
 					],
 					//select: true,					
 					"buttons": [
