@@ -800,11 +800,11 @@ date_default_timezone_set('America/Bogota');
 						</tr>
 						<tr>
 							<td>Valor: </td>
-							<td><input type="text" id="valor" name="valor" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 30%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
+							<td><input type="number" id="valor" name="valor" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 30%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
 						</tr>
 						<tr>
 							<td>Tasa: </td>
-							<td><input type="text" id="tasa" name="tasa" value="20" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 30%;font-size: 14px;text-align:center; border-color:gray;border-width:thin;line-height: 20px" />%</td>
+							<td><input type="number" id="tasa" name="tasa" value="20" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 30%;font-size: 14px;text-align:center; border-color:gray;border-width:thin;line-height: 20px" />%</td>
 						</tr>
 						<tr>
 							<td>Plazo: </td>
@@ -823,7 +823,7 @@ date_default_timezone_set('America/Bogota');
 	                	<tr id="numero_dias" style="display: none; width: 100%">
 		                	<td>Número de días: </td>
 		                	<td>
-		                		<input type="text" id="n_dias" name="n_dias" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 30%;font-size: 14px;text-align:center; border-color:gray;border-width:thin;line-height: 20px" /></td>
+		                		<input type="number" id="n_dias" name="n_dias" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 30%;font-size: 14px;text-align:center; border-color:gray;border-width:thin;line-height: 20px" /></td>
 		                </tr>
 	                	
 						<tr>
