@@ -610,7 +610,7 @@ date_default_timezone_set('America/Bogota');?>
 											<i class="fa fa-registered" aria-hidden="true"></i>
 										</div>
 									</button>
-									<button class='btn btn-lg' style='background-color:transparent;'> 
+									<button class='btn btn-lg' style='background-color:transparent;' onclick='acuerdoDePago("${row["celular"]}")'> 
 										<div style='text-align:center; color:green;'>
 											<i class='fa fa-whatsapp'></i>
 										</div>
