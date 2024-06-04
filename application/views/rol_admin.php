@@ -196,7 +196,7 @@ date_default_timezone_set('America/Bogota');?>
 								<th>Fecha</th>
 								<th>Cliente</th>
 								<th>Cuota</th>
-								<th>Mora</th>						
+								<th>M</th>						
 								<th>Saldo</th>
 								<th>Id</th>
 							</tr>
@@ -652,7 +652,12 @@ date_default_timezone_set('America/Bogota');?>
 							}
 						},
 						{"data": "cuota_pendiente"},
-						{"data": "mora_pendiente"},
+						//{"data": "mora_pendiente"},
+						{"render":
+							function ( data, type, row ) {
+								return `${row['dias_mora']}<br>${row['mora_total']}` 				         					
+							}
+						},
 						{"data": "saldo_total"},
 						{"data":"id_det_credito"}
 						
