@@ -359,10 +359,21 @@ date_default_timezone_set('America/Bogota');?>
 			$('body').removeClass('modal-open');//eliminamos la clase del body para poder hacer scroll
 			$('.modal-backdrop').remove();//eliminamos el backdrop del modal
 		}
+
+		$("#llamando").click(function(){
+		
+		var dropdowns = document.querySelectorAll('.dropdown');
+		dropdowns.forEach(function(dropdown) {
+			dropdown.removeAttribute('open');
+		});
+
+	});
 		
 
 
     });
+
+	
 
 /*	var listar = function (fecha_inicial){
 		table = $('#tabla_cobros').DataTable().destroy();
@@ -627,7 +638,7 @@ date_default_timezone_set('America/Bogota');?>
 												</a>
 											<span/>
 										</li>
-										<li style="font-size:12px">
+										<li style="font-size:12px" id="llamando">
 											<span>
 												<a href='tel:${row["celular"]}' style='color:blue;'>
 													<i class='fa fa-phone'>&emsp;Llamar</i>
