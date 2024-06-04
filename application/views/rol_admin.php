@@ -605,17 +605,17 @@ date_default_timezone_set('America/Bogota');?>
 								return(`
 								<p class="data">${row["nombre_completo"]}</p>
 								<div class="row">
-									<button class='form btn btn-lg reprogramar col-sm-3' style='background-color:transparent;'> 
+									<button class='form btn btn-lg reprogramar' style='background-color:transparent;'> 
 										<div style='text-align:center; color:black;'>
 											<i class="fa fa-registered" aria-hidden="true"></i>
 										</div>
 									</button>
-									<button class='btn btn-lg col-sm-3' style='background-color:transparent;'> 
+									<button class='btn btn-lg' style='background-color:transparent;'> 
 										<div style='text-align:center; color:green;'>
 											<i class='fa fa-whatsapp'></i>
 										</div>
 									</button>
-									<details class="dropdown" style="padding-left:20%; padding-top: 5%">
+									<details class="dropdown" style="padding-left:8%; padding-top: 6%">
 									<summary role="button">
 										<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
 									</summary>
