@@ -185,7 +185,7 @@ date_default_timezone_set('America/Bogota');?>
                     <table class="cell-border" id="tabla_cobros" width="100%" style="font-family:sans-serif; font-size: 10px;">
 						<colgroup>
 		       				<col style="width: 10%;">
-		       				<col style="width: 40%;">
+		       				<col style="width: 25%;">
 		       				<col style="width: 10%;">
 		       				<col style="width: 10%;">
 		       				<col style="width: 10%;">
@@ -572,7 +572,7 @@ date_default_timezone_set('America/Bogota');?>
 					"rowId": 'id_det_credito',
         			"select": true,
         			'deferRender': true,
-					"scrollY": "330px",
+					"scrollY": "475px",
         			"scrollCollapse": true,
         			'scroller': true,
         			"animate": true,
