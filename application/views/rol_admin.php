@@ -185,11 +185,10 @@ date_default_timezone_set('America/Bogota');?>
                     <table class="cell-border" id="tabla_cobros" width="100%" style="font-family:sans-serif; font-size: 10px;">
 						<colgroup>
 		       				<col style="width: 10%;">
-		       				<col style="width: 25%;">
+		       				<col style="width: 50%;">
 		       				<col style="width: 10%;">
 		       				<col style="width: 10%;">
 		       				<col style="width: 10%;">
-		       				
 		       			</colgroup>
 						<thead>
 							<tr style="color:#FFFFFF; background-color: #2E86C1;font-size: 10px;">
@@ -614,7 +613,7 @@ date_default_timezone_set('America/Bogota');?>
 							function (data, type, row){
 								return(`
 								<p class="data">${row["nombre_completo"]}</p>
-								<div class="row">
+								<div style="display: flex; justify-content: end;">
 									<button class='form btn btn-lg reprogramar' style='background-color:transparent;'> 
 										<div style='text-align:center; color:black;'>
 											<i class="fa fa-registered" aria-hidden="true"></i>
@@ -625,7 +624,7 @@ date_default_timezone_set('America/Bogota');?>
 											<i class='fa fa-whatsapp'></i>
 										</div>
 									</button>
-									<details class="dropdown" style="padding-left:8%; padding-top: 6%">
+									<details class="dropdown" style="padding-left:10%; padding-top: 6%">
 									<summary role="button">
 										<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
 									</summary>
