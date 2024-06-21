@@ -353,7 +353,6 @@ class Validacion_model extends CI_Model {
 	public function insertar_credito()
 	{
 		$this->load->helper('url');      
-        
 		$data = array(         
                  
          'id_cliente' => $this->input->post('id_cliente'),   
@@ -372,8 +371,8 @@ class Validacion_model extends CI_Model {
 		
 	    $this->db->insert('cab_credito', $data);
 
-        
-		$result = $this->db->query("SELECT C.id_cab_credito FROM cab_credito C WHERE C.id_cliente=". $this->input->post('id_cliente'). " and C.id_formadepago=".$this->input->post('formadepago')." and C.fecha_i = '".$this->input->post('fecha_i')."' and C.fecha_f = '".$this->input->post('fecha_f')."'and C.valor=". $this->input->post('valor'). " and C.totalapagar=". $this->input->post('totalapagar'));
+        $id_cliente = $this->input->post('id_cliente');
+		$result = $this->db->query("SELECT id_cab_credito FROM cab_credito WHERE id_cliente = $id_cliente order by id_cab_credito DESC LIMIT 1");
 
 		$cab_credito = $result->row_array();
 		

@@ -645,6 +645,7 @@ date_default_timezone_set('America/Bogota');
 
 	    function guardar()
 		{
+			
 		    if ($("#formadepago").val() == "Diario")
 		    {
 		    	$forma = 1; 
@@ -672,7 +673,7 @@ date_default_timezone_set('America/Bogota');
 		    formData.append("id_cliente",id_cliente);
 			formData.append("valor",$("#valor").val());
 			formData.append("tasa",$("#tasa").val());
-			formData.append("plazo",$("#plazo").val());
+			formData.append("plazo", (b_rep==1) ? $("#n_dias").val() : $("#plazo").val());
 			formData.append("formadepago",$forma);
 			formData.append("fecha_i",$("#fecha_i").val());
 			formData.append("fecha_f",$("#fecha_f").val());
