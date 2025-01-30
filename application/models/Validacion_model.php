@@ -626,7 +626,19 @@ class Validacion_model extends CI_Model {
 		
 		$result = $this->db->query("SELECT cc.id_cab_credito,dc.id_det_credito, c.cedula, c.nombre, c.apellido, c.telefono, cc.fecha_i, cc.fecha_f,cc.totalapagar,dc.v_cuota,cc.totalpagado,cc.mora, (select dc1.fechapago from det_credito dc1 where dc1.id_det_credito = dc.id_det_credito + 1 and dc1.id_cab_credito = cc.id_cab_credito) as proxima_fecha, (select sum(dc2.v_cuota - dc2.abono) from det_credito dc2 where dc2.id_cab_credito= cc.id_cab_credito and dc2.estado='pendiente' and dc2.fechapago<'" . date("Y/m/d") ."') as cuotas_atrasadas FROM det_credito dc, cliente c, cab_credito cc WHERE dc.id_det_credito = " . $id_det_credito . " and dc.id_cab_credito = cc.id_cab_credito and cc.id_cliente = c.id_cliente");
 		return $result;
+	}
 
+	public function consultarMoraCuotas($id_det_credito){
+		$result = $this->db->query("SELECT dc.* FROM det_credito AS dc
+			INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
+			WHERE cc.id_cab_credito = (
+				SELECT id_cab_credito FROM det_credito 
+					WHERE dc.dias_mora > 0 
+					AND cc.estado = 'pendiente'
+					AND dc.estado = 'pendiente'
+					AND id_det_credito = " . $id_det_credito . ")"
+		);
+		return $result;	
 	}
 
 	public function consulta_detalle_credito_por_abono($id_abono)
@@ -1699,11 +1711,87 @@ class Validacion_model extends CI_Model {
 	
 	public function actualizar_mora()
 	{
+		$queryCabeceraCreditos = $this->db->query("
+			UPDATE det_credito set fechaabono = NULL WHERE abono = 0;
+		");
 		//*****************************************************
 		//Consulta todos los creditos vencidos y actualiza la mora
 		//*****************************************************
 		$this->db->query("SET time_zone = '-05:00'");
-		$query = $this->db->query("SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos, 	round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes FROM cab_credito cc where cc.fecha_f < CURDATE() and cc.estado='pendiente'");
+		$query = $this->db->query("
+			SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos, 	
+				round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes 
+			FROM cab_credito cc 
+			WHERE cc.fecha_f < CURDATE() and cc.estado='pendiente' AND (aplica_calculo_por_cuota = 0 OR aplica_calculo_por_cuota IS NULL)
+		");
+
+		$queryCabeceraCreditos = $this->db->query("
+			SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos,
+				round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes 
+			FROM cab_credito cc
+			WHERE cc.fecha_i >= '2024-01-01' AND cc.aplica_calculo_por_cuota = 1 AND cc.estado = 'pendiente' AND cc.id_formadepago <> 1;
+		");
+
+		foreach ($queryCabeceraCreditos->result_array() as $rowCabecera) {
+
+			$queryDetalleCreditos = $this->db->query("
+				SELECT dc.*,cc.valor, cc.tasa, cc.interes,cc.plazo,  
+					case
+						-- when (dc.fechaabono IS NOT NULL AND dc.estado = 'pendiente') then (DATEDIFF(dc.fechaabono,dc.fechapago)) 
+						when dc.estado = 'pendiente' then (DATEDIFF(CURDATE(),dc.fechapago))
+					ELSE dc.dias_mora END AS d_vencidos,
+				fp.descripcion,
+				CASE 
+				WHEN fp.descripcion = 'semanal' THEN 
+					ROUND((((cc.interes / cc.plazo) / 2) * ABS(DATEDIFF(CURDATE(), 
+						CASE 
+							WHEN dc.fechaabono IS NOT NULL THEN dc.fechaabono
+							ELSE dc.fechapago
+						END))), 2)
+				WHEN fp.descripcion = 'quincenal' THEN 
+					ROUND(((cc.interes / cc.plazo) * ABS(DATEDIFF(CURDATE(), 
+						CASE 
+							WHEN dc.fechaabono IS NOT NULL THEN dc.fechaabono
+							ELSE dc.fechapago
+						END))), 2)
+				WHEN fp.descripcion = 'mensual' THEN 
+					ROUND(((cc.interes / cc.plazo) * 2) * ABS(DATEDIFF(CURDATE(), 
+						CASE 
+							WHEN dc.fechaabono IS NOT NULL THEN dc.fechaabono
+							ELSE dc.fechapago
+						END)), 2)
+				ELSE NULL
+			END AS mora
+				FROM det_credito AS dc
+				INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
+				INNER JOIN formadepago AS fp ON fp.id_formadepago = cc.id_formadepago
+				AND dc.estado = 'pendiente'
+				AND dc.n_cuota > 0
+				AND cc.id_cab_credito = ".$rowCabecera['id_cab_credito']."
+				ORDER BY dc.id_cab_credito DESC, dc.n_cuota DESC");
+
+			$lastDetalle = array();
+			foreach ($queryDetalleCreditos->result_array() as $row) {
+				$lastDetalle = $row[0];
+				$this->db->set('dias_mora',($row['d_vencidos']>0)? $row['d_vencidos']:0);
+				$this->db->set('valor_mora',($row['d_vencidos']>0) ? $row['mora'] : 0);
+				$this->db->where('id_det_credito', $row['id_det_credito']);
+				$this->db->update('det_credito');
+			}
+
+			if($rowCabecera['d_vencidos'] > 0){
+				$this->db->set('dias_mora',($rowCabecera['d_vencidos']));
+				$this->db->set('valor_mora',($rowCabecera['mora']));
+				$this->db->where('id_det_credito', $lastDetalle['id_det_credito']);
+				$this->db->update('det_credito');
+			}else{
+				$this->db->set('dias_mora',0);
+				$this->db->set('valor_mora',0);
+				$this->db->where('id_det_credito', $lastDetalle['id_det_credito']);
+				$this->db->update('det_credito');
+			}
+			
+		}
 		
 		foreach ($query->result_array() as $row) {
 			$d_mora = $row["d_vencidos"];
