@@ -438,7 +438,7 @@ class Validacion_model extends CI_Model {
 				and CC.id_cab_credito=DC.id_cab_credito 
 				and CI.id_usuario =". $id_usuario. " 
 				and DC.estado='pendiente' 
-				and DC.fechapago = '". $this->input->post('fecha_i'). "' 
+				and DC.fecha_recordatorio = '". $this->input->post('fecha_i'). "' 
 				and DC.n_cuota !=0 
 				order by CI.antecesor");
 
@@ -518,7 +518,7 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta a la BD para actualizar fecha
 		*/
-		$this->db->set('fechapago', $fecha_r);
+		$this->db->set('fecha_recordatorio', $fecha_r);
       	$this->db->where('id_det_credito', $id_det_credito);
       	$this->db->update('det_credito');
 
@@ -1772,7 +1772,7 @@ class Validacion_model extends CI_Model {
 
 			$lastDetalle = array();
 			foreach ($queryDetalleCreditos->result_array() as $row) {
-				$lastDetalle = $row[0];
+				$lastDetalle = $queryDetalleCreditos->result_array()[0];
 				$this->db->set('dias_mora',($row['d_vencidos']>0)? $row['d_vencidos']:0);
 				$this->db->set('valor_mora',($row['d_vencidos']>0) ? $row['mora'] : 0);
 				$this->db->where('id_det_credito', $row['id_det_credito']);
@@ -1821,6 +1821,7 @@ class Validacion_model extends CI_Model {
 			      	 	'id_cab_credito' => $id_cab_credito,
 			      	 	'n_cuota' => 0,
 			      	 	'fechapago' => date("Y/m/d"),
+						'fecha_recordatorio' => date("Y/m/d"),
 			      	 	'v_cuota' => $mora,
 			      	 	'abono' => 0,
 			      	 	'estado' => "pendiente"	
@@ -1831,10 +1832,10 @@ class Validacion_model extends CI_Model {
 			}
 			else
 			{	
-
 				$query = $result->row_array();				
 				$id_det_credito = $query['id_det_credito'];
 				$this->db->set('fechapago', date("Y/m/d"));
+				$this->db->set('fecha_recordatorio', date("Y/m/d"));
 				$this->db->set('v_cuota',$mora);
 	      		$this->db->where('id_det_credito', $id_det_credito);
 	      		$this->db->update('det_credito');
