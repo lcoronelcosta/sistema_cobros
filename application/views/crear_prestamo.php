@@ -667,7 +667,9 @@ date_default_timezone_set('America/Bogota');
 		    var id_cliente = document.getElementById("cliente").value;
             //alert(id_cliente + "-" + $("#motivo").val() + "-" + $("#valor").val() + "-" + $("#tasa").val() + "-" + $("#plazo").val() + "-" + $forma + "-" + $("#fecha_i").val() + "-" + $("#fecha_f").val() + "-" + $("#interes").val() + "-" + $("#totalapagar").val() + "- 0 -" + "pendiente");
             
-		    
+
+			var check = document.getElementById("aplicaMoraPorCuotas");
+			var chequeado= (check.checked) ? true : false;
 		    
 		    //formData.append("id_cliente",$("#id_cliente").val());
 		    formData.append("id_cliente",id_cliente);
@@ -680,6 +682,7 @@ date_default_timezone_set('America/Bogota');
 			formData.append("interes",$("#interes").val());
 			formData.append("totalapagar",$("#totalapagar").val());	
 			formData.append("mora",0);
+			formData.append("aplicaMoraPorCuotas",chequeado);
 			formData.append("estado","pendiente");
 			formData.append("motivo",$("#motivo").val());
 			var credito = {};
@@ -854,6 +857,18 @@ date_default_timezone_set('America/Bogota');
 							<td>
 								<input type="text" readonly="true" id="interes" name="interes" required maxlength="45" onkeypress="return letras(event)" style="display: none" />
 								<input type="text" readonly="true" id="totalapagar" name="totalapagar" required maxlength="45" onkeypress="return letras(event)" style="height: 30px;width: 100%;font-size: 12px;border-color:gray;border-width:thin;line-height: 20px" /></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<div class="form-check" style="margin-top: 3%;">
+									<input class="form-check-input" type="checkbox" value="" id="aplicaMoraPorCuotas" checked style="height: 20px;width: 20px;">
+									<label class="form-check-label" for="aplicaMoraPorCuotas" style="margin-left: 5%;">
+										Aplica Calculo de Mora por Cuotas
+									</label>
+								</div>
+							</td>
+								
 						</tr>
 						
 					</table>

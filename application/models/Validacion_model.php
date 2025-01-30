@@ -365,6 +365,7 @@ class Validacion_model extends CI_Model {
          'interes' => $this->input->post('interes'),
          'totalapagar' => $this->input->post('totalapagar'),
          'mora' => $this->input->post('mora'),
+		 'aplica_calculo_por_cuota' => ($this->input->post('aplicaMoraPorCuotas') == "true")?1:0,
          'estado' => $this->input->post('estado'),
          'motivo' => $this->input->post('motivo')
       	);
@@ -1612,7 +1613,7 @@ class Validacion_model extends CI_Model {
 		//*************************************************************************
 		//Busca toda la infomaci�n de la cabecera del cr�dito que esta seleccionado
 		//*************************************************************************
-		$result = $this->db->query("SELECT cc.id_cab_credito, c.nombre, c.apellido, cc.valor, cc.tasa, cc.plazo, cc.fecha_i, cc.fecha_f, cc.interes, cc.totalapagar, cc.mora, cc.estado, cc.totalpagado, f.descripcion FROM cab_credito cc, cliente c, formadepago f WHERE cc.id_cliente=c.id_cliente and cc.id_formadepago=f.id_formadepago and cc.id_cab_credito=" . $id_cab_credito);
+		$result = $this->db->query("SELECT cc.id_cab_credito, c.nombre, c.apellido, cc.valor, cc.tasa, cc.plazo, cc.fecha_i, cc.fecha_f, cc.interes, cc.totalapagar, cc.mora, cc.estado, cc.totalpagado, f.descripcion, cc.aplica_calculo_por_cuota FROM cab_credito cc, cliente c, formadepago f WHERE cc.id_cliente=c.id_cliente and cc.id_formadepago=f.id_formadepago and cc.id_cab_credito=" . $id_cab_credito);
 		return $result;
 
 	}

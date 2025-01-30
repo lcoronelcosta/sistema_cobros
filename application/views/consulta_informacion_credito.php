@@ -231,7 +231,19 @@ date_default_timezone_set('America/Bogota');
 							<td>
 								<input type="text" readonly="true" id="totalpagado" readonly="true" name="totalpagado" required maxlength="45" value="<?php echo $totalpagado?>" style="height: 30px;width: 100%;font-size: 12px;border-color:gray;border-width:thin;line-height: 20px" />
 							</td>
-						</tr>						
+						</tr>	
+						<tr>
+							<td></td>
+							<td>
+								<div class="form-check" style="margin-top: 3%;">
+									<input class="form-check-input" type="checkbox" value="" id="aplicaMoraPorCuotas" <?php if($aplica_calculo_por_cuota) { echo 'checked';}?> style="height: 20px;width: 20px;">
+									<label class="form-check-label" for="aplicaMoraPorCuotas" style="margin-left: 5%;">
+										Aplica Calculo de Mora por Cuotas
+									</label>
+								</div>
+							</td>
+								
+						</tr>					
 					</table>
 					<br>
 					
