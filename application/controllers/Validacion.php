@@ -466,11 +466,12 @@ class Validacion extends CI_Controller {
 			redirect(base_url().'index.php/menu_principal/abono_edit');
 		}else{
 			$query =$this->validacion_model->consulta_detalle_credito($_POST['id_detalle_credito']);
-			$detalle_credito = $query->row_array(); //El resultado del Query lo convierto en un Array.				
+			$queryMoras =$this->validacion_model->consultarMoraCuotas($_POST['id_detalle_credito']);
+			$detalle_credito = $query->row_array(); //El resultado del Query lo convierto en un Array.
+			$detalle_credito['detalle_moras_cuotas'] =	$queryMoras->result();
 			$this->session->set_userdata('detalle_credito',$detalle_credito);
 			redirect(base_url().'index.php/menu_principal/abono');
 		}
-		
 	}
 
 	public function mostrar_abonos()

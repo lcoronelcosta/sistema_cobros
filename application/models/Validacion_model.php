@@ -392,6 +392,7 @@ class Validacion_model extends CI_Model {
 	      	 	'id_cab_credito' => $cab_credito["id_cab_credito"],
 	      	 	'n_cuota' => $value["cuota"],
 	      	 	'fechapago' => $value["fecha"],
+				'fecha_recordatorio' => $value["fecha"],
 	      	 	'v_cuota' => round($value["valor"],2),
 	      	 	'abono' => 0,
 	      	 	'estado' => "pendiente"	

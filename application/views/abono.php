@@ -309,15 +309,26 @@ date_default_timezone_set('America/Bogota');
 </head>
 
 <body  class="body_alterno">
+	<?php $totalMoraCuotas = 0.00; 
+		foreach($detalle_moras_cuotas as $key=>$value){
+			$totalMoraCuotas = $totalMoraCuotas + $value->valor_mora;
+		}
+	?>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 offset-md-3 myform-cont" >				
 				<div class="myform-top">
 					<strong align="left">Registro de Abono</strong>
-				</div>					
-
+				</div>		
+				
 				<div class="myform-bottom">
-                   	<table width="100%"> 	
+                   	<table width="100%"> 
+					   <tr>
+							<td colspan="2">
+								<hr>
+								<h6>Detalles del credito</h6>
+							</td>
+						</tr>	
 						<tr>
 							<td> Cédula: </td>
 							<td><input type="text" readonly="true" id="cedula" value="<?php echo $cedula?>" name="cedula" required maxlength="45"style="height: 30px;width: 100%;font-size: 12px;border-color:gray;border-width:thin;line-height: 20px" /></td>
@@ -349,13 +360,10 @@ date_default_timezone_set('America/Bogota');
 							<td><input type="text" readonly="true" id="valor" name="valor" value="$ <?php echo ($totalapagar - $mora)?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
 						</tr>
 						<tr>
-							<td>Cuota actual: </td>
-							<td><input type="text" readonly="true" id="cuota" name="cuota" value="$ <?php echo $v_cuota?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
-						</tr>
-						<tr>
 							<td>Valor atrasado: </td>
 							<td><input type="text" readonly="true" id="atrasadas" name="atrasadas" value="$ <?php echo $cuotas_atrasadas?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
 						</tr>
+						
 						<tr>
 							<td>Valor Mora: </td>
 							<td><input type="text" readonly="true" id="mora" name="mora" value="$ <?php echo $mora?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
@@ -376,7 +384,56 @@ date_default_timezone_set('America/Bogota');
 							<td>Saldo a pagar: </td>
 							<td><input type="text" readonly="true" id="saldo" name="saldo" value="$ <?php echo ($totalapagar - $totalpagado)?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
 						</tr>
-							
+						<tr>
+							<td colspan="2">
+								<hr>
+								<h6>Detalles de las cuotas</h6>
+							</td>
+						</tr>
+						<tr>
+							<td>Cuota actual: </td>
+							<td><input type="text" readonly="true" id="cuota" name="cuota" value="$ <?php echo $v_cuota?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
+						</tr>
+						<tr>
+							<td>Total Mora por cuotas: </td>
+							<td><input type="text" readonly="true" id="cuota" name="cuota" value="$ <?php echo($totalMoraCuotas) ?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
+							<td>
+								<a class="btn btn-primary btn-sm" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+									Detalle
+								</a>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								<div class="collapse" id="collapseExample" style="margin: 5% 0%;">
+									<div class="card card-body">
+										<table>
+											<thead>
+												<th>N° Cuota</th>
+												<th>Fecha</th>
+												<th>Días Atraso</th>
+												<th>Total Mora</th>
+											</thead>
+											<tbody>
+												<?php
+													foreach($detalle_moras_cuotas as $key=>$value){
+														?>
+															<tr>
+																<td><?php echo ($value->n_cuota) ?></td>
+																<td><?php echo ($value->fechapago) ?></td>
+																<td><?php echo ($value->dias_mora) ?></td>
+																<td><?php echo ($value->valor_mora) ?></td>
+															</tr>
+														<?php
+													}
+												?>
+											</tbody>
+											
+										</table>
+									</div>
+								</div>
+							</td>
+						</tr>
 						<tr>	 	 	
 							<td>Próximo Pago</td>
 							<td><input type="text" readonly="true" name="fecha_p"  id="fecha_p" value="<?php 
