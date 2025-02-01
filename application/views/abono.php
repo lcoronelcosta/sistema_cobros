@@ -309,9 +309,12 @@ date_default_timezone_set('America/Bogota');
 </head>
 
 <body  class="body_alterno">
-	<?php $totalMoraCuotas = 0.00; 
+	<?php 
+		$totalMoraCuotas = 0.00; 
+		$totalDiasMoraCuotas = 0;
 		foreach($detalle_moras_cuotas as $key=>$value){
 			$totalMoraCuotas = $totalMoraCuotas + $value->valor_mora;
+			$totalDiasMoraCuotas = $totalDiasMoraCuotas + $value->dias_mora;
 		}
 	?>
 	<div class="container">
@@ -397,11 +400,18 @@ date_default_timezone_set('America/Bogota');
 						<tr>
 							<td>Total Mora por cuotas: </td>
 							<td><input type="text" readonly="true" id="cuota" name="cuota" value="$ <?php echo($totalMoraCuotas) ?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
-							<td>
-								<a class="btn btn-primary btn-sm" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-									Detalle
-								</a>
-							</td>
+							<?php
+								if($aplica_calculo_por_cuota){
+									?>
+										<td>
+											<a class="btn btn-primary btn-sm" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+												Detalle
+											</a>
+										</td>
+									<?php
+								}
+							?>
+							
 						</tr>
 						<tr>
 							<td colspan="3">

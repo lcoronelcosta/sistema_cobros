@@ -625,7 +625,7 @@ class Validacion_model extends CI_Model {
 	public function consulta_detalle_credito($id_det_credito)
 	{
 		
-		$result = $this->db->query("SELECT cc.id_cab_credito,dc.id_det_credito, c.cedula, c.nombre, c.apellido, c.telefono, cc.fecha_i, cc.fecha_f,cc.totalapagar,dc.v_cuota,cc.totalpagado,cc.mora, (select dc1.fechapago from det_credito dc1 where dc1.id_det_credito = dc.id_det_credito + 1 and dc1.id_cab_credito = cc.id_cab_credito) as proxima_fecha, (select sum(dc2.v_cuota - dc2.abono) from det_credito dc2 where dc2.id_cab_credito= cc.id_cab_credito and dc2.estado='pendiente' and dc2.fechapago<'" . date("Y/m/d") ."') as cuotas_atrasadas FROM det_credito dc, cliente c, cab_credito cc WHERE dc.id_det_credito = " . $id_det_credito . " and dc.id_cab_credito = cc.id_cab_credito and cc.id_cliente = c.id_cliente");
+		$result = $this->db->query("SELECT cc.id_cab_credito,dc.id_det_credito, c.cedula, c.nombre, c.apellido, c.telefono, cc.fecha_i, cc.fecha_f,cc.totalapagar,dc.v_cuota,cc.totalpagado,cc.mora, cc.aplica_calculo_por_cuota, (select dc1.fechapago from det_credito dc1 where dc1.id_det_credito = dc.id_det_credito + 1 and dc1.id_cab_credito = cc.id_cab_credito) as proxima_fecha, (select sum(dc2.v_cuota - dc2.abono) from det_credito dc2 where dc2.id_cab_credito= cc.id_cab_credito and dc2.estado='pendiente' and dc2.fechapago<'" . date("Y/m/d") ."') as cuotas_atrasadas FROM det_credito dc, cliente c, cab_credito cc WHERE dc.id_det_credito = " . $id_det_credito . " and dc.id_cab_credito = cc.id_cab_credito and cc.id_cliente = c.id_cliente");
 		return $result;
 	}
 
@@ -1713,7 +1713,7 @@ class Validacion_model extends CI_Model {
 	public function actualizar_mora()
 	{
 		$queryCabeceraCreditos = $this->db->query("
-			UPDATE det_credito set fechaabono = NULL WHERE abono = 0;
+			UPDATE det_credito set fechaabono = NULL WHERE abono = 0 and estado = 'pendiente';
 		");
 		//*****************************************************
 		//Consulta todos los creditos vencidos y actualiza la mora
@@ -1730,7 +1730,7 @@ class Validacion_model extends CI_Model {
 			SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos,
 				round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes 
 			FROM cab_credito cc
-			WHERE cc.fecha_i >= '2024-01-01' AND cc.aplica_calculo_por_cuota = 1 AND cc.estado = 'pendiente' AND cc.id_formadepago <> 1;
+			WHERE cc.fecha_i >= '2025-01-01' AND cc.aplica_calculo_por_cuota = 1 AND cc.estado = 'pendiente' AND cc.id_formadepago <> 1;
 		");
 
 		foreach ($queryCabeceraCreditos->result_array() as $rowCabecera) {
