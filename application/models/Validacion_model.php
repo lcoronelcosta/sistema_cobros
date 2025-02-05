@@ -439,7 +439,7 @@ class Validacion_model extends CI_Model {
 				and CC.id_cab_credito=DC.id_cab_credito 
 				and CI.id_usuario =". $id_usuario. " 
 				and DC.estado='pendiente' 
-				and DC.fecha_recordatorio = '". $this->input->post('fecha_i'). "' 
+				and DC.fechapago = '". $this->input->post('fecha_i'). "' 
 				and DC.n_cuota !=0 
 				order by CI.antecesor");
 
@@ -2055,9 +2055,10 @@ class Validacion_model extends CI_Model {
 		if($success){
 			foreach ($result->result_array() as $row) {
 				$saldo = $row['v_cuota']-$row['abono'];
-				$saldoTotal = $saldo+$saldoTotal;
+				$moraActual = $row['valor_mora'];
+				$saldoTotal = $saldo+$saldoTotal+$moraActual;
 				if($row['n_cuota'] == 0){
-					$detalleString = $detalleString.'*Mora*'.'%0A';
+					$detalleString = $detalleString.'*Mora Prestamo*'.'%0A';
 					$detalleString = $detalleString.'- Días: '.$diasMora.'%0A';
 					$detalleString = $detalleString.'- Fecha: '.$row['fechapago'].'%0A';
 				}else{
@@ -2066,7 +2067,8 @@ class Validacion_model extends CI_Model {
 					$i++;
 				}
 				$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
-				$detalleString = $detalleString.'- Saldo: $'.$saldo.'%0A';
+				$detalleString = $detalleString.'- Mora cuota : $'.$moraActual.'%0A';
+				$detalleString = $detalleString.'- Saldo: $'.($saldo+$moraActual).'%0A';
 				$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
 			}
 	
