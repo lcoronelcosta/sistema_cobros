@@ -410,7 +410,7 @@ date_default_timezone_set('America/Bogota');
 							<td colspan="3">
 								<div class="collapse" id="collapseExample" style="margin: 5% 0%;">
 									<div class="card card-body">
-										<table>
+										<table class="table" style="font-size: x-small; line-height: normal;">
 											<thead>
 												<th>N° Cuota</th>
 												<th>Fecha</th>
