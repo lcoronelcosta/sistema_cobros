@@ -122,7 +122,7 @@ date_default_timezone_set('America/Bogota');?>
                     <tr style="height: 15px"></tr>
                 	<form action="<?= base_url() .'index.php/validacion/abono'?>" method="post" class="" onsubmit="target_popup(this)">
 	                	<tr>                		
-	                		<td align="center"><input type="submit" id="btn_abonar" disabled name="btn_abonar"class="btn-sm" style="background-color: #C8216A; opacity: 0.5;color: #FFFFFF;width: 110px;" value="Abonar"/></td>
+	                		<td align="center"><input type="submit" id="btn_abonar" name="btn_abonar"class="btn-sm" style="background-color: #C8216A; opacity: 0.5;color: #FFFFFF;width: 110px;" value="Abonar"/></td>
 	                		<td><input type="text" style="display: none;" value="ad" name="id_detalle_credito" id="id_detalle_credito"></td>
 
 	                	</tr>	                

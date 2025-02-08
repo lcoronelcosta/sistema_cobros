@@ -439,7 +439,7 @@ class Validacion_model extends CI_Model {
 				and CC.id_cab_credito=DC.id_cab_credito 
 				and CI.id_usuario =". $id_usuario. " 
 				and DC.estado='pendiente' 
-				and DC.fechapago = '". $this->input->post('fecha_i'). "' 
+				and DC.fecha_recordatorio = '". $this->input->post('fecha_i'). "' 
 				and DC.n_cuota !=0 
 				order by CI.antecesor");
 
@@ -636,7 +636,7 @@ class Validacion_model extends CI_Model {
 				SELECT id_cab_credito FROM det_credito 
 					WHERE dc.dias_mora > 0 
 					AND cc.estado = 'pendiente'
-					AND dc.estado = 'pendiente'
+					AND (dc.estado = 'pendiente' OR dc.dias_mora > 0)
 					AND id_det_credito = " . $id_det_credito . ")"
 		);
 		return $result;	
@@ -1738,44 +1738,38 @@ class Validacion_model extends CI_Model {
 			$queryDetalleCreditos = $this->db->query("
 				SELECT dc.*,cc.valor, cc.tasa, cc.interes,cc.plazo,  
 					case
-						-- when (dc.fechaabono IS NOT NULL AND dc.estado = 'pendiente') then (DATEDIFF(dc.fechaabono,dc.fechapago)) 
+						-- when (dc.fechaabono IS NULL AND dc.estado = 'pendiente') then (DATEDIFF(CURDATE(),dc.fechapago)) 
+						-- when (dc.fechaabono IS NOT NULL AND dc.estado = 'cancelado') then (DATEDIFF(dc.fechaabono,dc.fechapago)) 
+						-- when dc.estado = 'pendiente' then (DATEDIFF(CURDATE(),dc.fechapago))
 						when dc.estado = 'pendiente' then (DATEDIFF(CURDATE(),dc.fechapago))
-					ELSE dc.dias_mora END AS d_vencidos,
+						when dc.estado = 'cancelado' then (DATEDIFF(dc.fechaabono,dc.fechapago))
+					ELSE (DATEDIFF(dc.fechaabono,dc.fechapago)) END AS d_vencidos,
 				fp.descripcion,
 				CASE 
-				WHEN fp.descripcion = 'semanal' THEN 
-					ROUND((((cc.interes / cc.plazo) / 2) * ABS(DATEDIFF(CURDATE(), 
-						CASE 
-							WHEN dc.fechaabono IS NOT NULL THEN dc.fechaabono
-							ELSE dc.fechapago
-						END))), 2)
-				WHEN fp.descripcion = 'quincenal' THEN 
-					ROUND(((cc.interes / cc.plazo) * ABS(DATEDIFF(CURDATE(), 
-						CASE 
-							WHEN dc.fechaabono IS NOT NULL THEN dc.fechaabono
-							ELSE dc.fechapago
-						END))), 2)
-				WHEN fp.descripcion = 'mensual' THEN 
-					ROUND(((cc.interes / cc.plazo) * 2) * ABS(DATEDIFF(CURDATE(), 
-						CASE 
-							WHEN dc.fechaabono IS NOT NULL THEN dc.fechaabono
-							ELSE dc.fechapago
-						END)), 2)
-				ELSE NULL
-			END AS mora
+					WHEN fp.descripcion = 'semanal' THEN ((cc.interes / cc.plazo) / 2)
+					WHEN fp.descripcion = 'quincenal' THEN (cc.interes / cc.plazo)
+					WHEN fp.descripcion = 'mensual' THEN ((cc.interes / cc.plazo)*2)
+					ELSE NULL
+				END AS interes_porcentaje
+				
 				FROM det_credito AS dc
 				INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
 				INNER JOIN formadepago AS fp ON fp.id_formadepago = cc.id_formadepago
-				AND dc.estado = 'pendiente'
+				AND dc.estado in ('pendiente', 'cancelado')
 				AND dc.n_cuota > 0
 				AND cc.id_cab_credito = ".$rowCabecera['id_cab_credito']."
 				ORDER BY dc.id_cab_credito DESC, dc.n_cuota DESC");
+
+			if($rowCabecera['id_cab_credito'] == '7483'){
+				log_message('error', json_encode($queryDetalleCreditos));
+
+			}
 
 			$lastDetalle = array();
 			foreach ($queryDetalleCreditos->result_array() as $row) {
 				$lastDetalle = $queryDetalleCreditos->result_array()[0];
 				$this->db->set('dias_mora',($row['d_vencidos']>0)? $row['d_vencidos']:0);
-				$this->db->set('valor_mora',($row['d_vencidos']>0) ? $row['mora'] : 0);
+				$this->db->set('valor_mora',($row['d_vencidos']>0) ? round(($row['interes_porcentaje']*$row['d_vencidos']), 2) : 0);
 				$this->db->where('id_det_credito', $row['id_det_credito']);
 				$this->db->update('det_credito');
 			}

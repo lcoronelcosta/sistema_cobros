@@ -333,19 +333,12 @@ date_default_timezone_set('America/Bogota');
 							</td>
 						</tr>	
 						<tr>
-							<td> Cédula: </td>
-							<td><input type="text" readonly="true" id="cedula" value="<?php echo $cedula?>" name="cedula" required maxlength="45"style="height: 30px;width: 100%;font-size: 12px;border-color:gray;border-width:thin;line-height: 20px" /></td>
-							
 							<td><input type="text" readonly="true" id="id_cab_credito" value="<?php echo $id_cab_credito?>" name="id_cab_credito" style="display: none;" /></td>		
 							<td><input type="text" readonly="true" id="id_det_credito" value="<?php echo $id_det_credito?>" name="id_det_credito" style="display: none;" /></td>													
 						</tr>
 						<tr>
 							<td> Nombre: </td>
 							<td><input type="text" readonly="true" value="<?php echo $nombre?> <?php echo $apellido?>" id="nombre" name="nombre" required maxlength="45"style="height: 30px;width: 100%;font-size: 12px;border-color:gray;border-width:thin;line-height: 20px" /></td>
-						</tr>
-						<tr>
-							<td> Teléfono: </td>
-							<td><input type="text" readonly="true" id="telefono" value="<?php echo $telefono?>" name="telefono" required maxlength="45"style="height: 30px;width: 100%;font-size: 12px;border-color:gray;border-width:thin;line-height: 20px" /></td>
 						</tr>
 						<tr>	 	 	
 						 	<td>Fecha Inicio</td>
