@@ -897,13 +897,14 @@ class Validacion_model extends CI_Model {
 		//*****************************************************
 		$this->load->helper('url'); 
 
-		$query = $this->db->query("SELECT id_det_credito, v_cuota, abono FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente'");
-		
+		$query = $this->db->query("SELECT id_det_credito, v_cuota, abono, valor_mora FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente'");
+		$valorCuota = round($query->result_array()[0]["v_cuota"],2);
 
 		foreach ($query->result_array() as $row) {
 			$cuota = round($row["v_cuota"],2);
 			$abono_t = round($row["abono"],2);
 			$id_det_credito_t = $row["id_det_credito"];
+			$valor_mora = round($row["v_cuota"],2);
 
 			
 			if (! $sinliquidar)
@@ -925,15 +926,49 @@ class Validacion_model extends CI_Model {
 			}
 			else
 			{
-				$this->db->set('abono','abono +'. (float)$valor_abono, FALSE);
-				$this->db->set('fechaabono',date("Y/m/d"));
-	      		$this->db->where('id_det_credito', $id_det_credito_t);
-    	  		$this->db->update('det_credito');
+				//Logica de cuotas con mora
+				$queryCuotasConMora = $this->db->query("SELECT id_det_credito, v_cuota, abono, valor_mora, abono_mora FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.valor_mora > 0 and dc.estado_mora = 'pendiente' ORDER BY n_cuota ASC");
+				if(count($queryCuotasConMora->result_array()) > 0 && $valor_abono > 0){
+					foreach ($queryCuotasConMora->result_array() as $rowCuotasConMora) {
+						$valorMora = round($rowCuotasConMora["valor_mora"],2);
+						$abonoMora = round($rowCuotasConMora["abono_mora"],2);
+						$idDetalleMora = $rowCuotasConMora["id_det_credito"];
 
-    	  		$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
-    	  				
-    	  		break;			
-			}			
+						log_message('error', 'VALOR ABONO : '.$valor_abono);
+
+
+						if (($valor_abono - ($valorMora - $abonoMora)) >= 0)
+						{
+							$this->db->set('abono_mora',$valorMora);
+							$this->db->set('estado_mora',"cancelado");
+							$this->db->where('id_det_credito', $idDetalleMora);
+							$this->db->update('det_credito');
+	
+							$valor_abono = round($valor_abono - ($valorMora - $abonoMora),2);				
+						}else{
+							$this->db->set('abono_mora','abono_mora +'. (float)$valor_abono, FALSE);
+							$this->db->where('id_det_credito', $idDetalleMora);
+							$this->db->update('det_credito');
+	
+							$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
+
+							break;
+						}
+					}
+				}elseif($valor_abono > 0){
+					$this->db->set('abono','abono +'. (float)$valor_abono, FALSE);
+					$this->db->set('fechaabono',date("Y/m/d"));
+					$this->db->where('id_det_credito', $id_det_credito_t);
+					$this->db->update('det_credito');
+
+					$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
+							
+					break;		
+				}else{
+					break;
+				}
+			}	
+			//Proceso 		
 		}
 
 		
