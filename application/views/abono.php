@@ -313,7 +313,7 @@ date_default_timezone_set('America/Bogota');
 		$totalMoraCuotas = 0.00; 
 		$totalDiasMoraCuotas = 0;
 		foreach($detalle_moras_cuotas as $key=>$value){
-			$totalMoraCuotas = $totalMoraCuotas + $value->valor_mora;
+			$totalMoraCuotas = $totalMoraCuotas + ($value->valor_mora - $value->abono_mora);
 			$totalDiasMoraCuotas = $totalDiasMoraCuotas + $value->dias_mora;
 		}
 	?>

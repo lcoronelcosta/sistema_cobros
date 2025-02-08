@@ -897,14 +897,13 @@ class Validacion_model extends CI_Model {
 		//*****************************************************
 		$this->load->helper('url'); 
 
-		$query = $this->db->query("SELECT id_det_credito, v_cuota, abono, valor_mora FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente'");
-		$valorCuota = round($query->result_array()[0]["v_cuota"],2);
+		$query = $this->db->query("SELECT id_det_credito, v_cuota, abono FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente' AND fechapago <= DATE(NOW()) ");
+		
 
 		foreach ($query->result_array() as $row) {
 			$cuota = round($row["v_cuota"],2);
 			$abono_t = round($row["abono"],2);
 			$id_det_credito_t = $row["id_det_credito"];
-			$valor_mora = round($row["v_cuota"],2);
 
 			
 			if (! $sinliquidar)
@@ -926,36 +925,79 @@ class Validacion_model extends CI_Model {
 			}
 			else
 			{
-				//Logica de cuotas con mora
-				$queryCuotasConMora = $this->db->query("SELECT id_det_credito, v_cuota, abono, valor_mora, abono_mora FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.valor_mora > 0 and dc.estado_mora = 'pendiente' ORDER BY n_cuota ASC");
-				if(count($queryCuotasConMora->result_array()) > 0 && $valor_abono > 0){
-					foreach ($queryCuotasConMora->result_array() as $rowCuotasConMora) {
-						$valorMora = round($rowCuotasConMora["valor_mora"],2);
-						$abonoMora = round($rowCuotasConMora["abono_mora"],2);
-						$idDetalleMora = $rowCuotasConMora["id_det_credito"];
+				$this->db->set('abono','abono +'. (float)$valor_abono, FALSE);
+				$this->db->set('fechaabono',date("Y/m/d"));
+	      		$this->db->where('id_det_credito', $id_det_credito_t);
+    	  		$this->db->update('det_credito');
 
-						log_message('error', 'VALOR ABONO : '.$valor_abono);
+    	  		$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
+    	  				
+    	  		break;			
+			}			
+		}
 
 
-						if (($valor_abono - ($valorMora - $abonoMora)) >= 0)
-						{
-							$this->db->set('abono_mora',$valorMora);
-							$this->db->set('estado_mora',"cancelado");
-							$this->db->where('id_det_credito', $idDetalleMora);
-							$this->db->update('det_credito');
-	
-							$valor_abono = round($valor_abono - ($valorMora - $abonoMora),2);				
-						}else{
-							$this->db->set('abono_mora','abono_mora +'. (float)$valor_abono, FALSE);
-							$this->db->where('id_det_credito', $idDetalleMora);
-							$this->db->update('det_credito');
-	
-							$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
+		log_message('error', 'VALOR ABONO ANTES DE CUOTAS CON MORA : '.$valor_abono);
 
-							break;
-						}
+		//Logica para las mora a nivel de cuotas
+		if($valor_abono > 0){
+			$queryCuotasConMora = $this->db->query("SELECT id_det_credito, v_cuota, abono, valor_mora, abono_mora FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.valor_mora > 0 and dc.estado_mora = 'pendiente' ORDER BY n_cuota ASC");
+			if(count($queryCuotasConMora->result_array()) > 0 && $valor_abono > 0){
+				foreach ($queryCuotasConMora->result_array() as $rowCuotasConMora) {
+					$valorMora = round($rowCuotasConMora["valor_mora"],2);
+					$abonoMora = round($rowCuotasConMora["abono_mora"],2);
+					$idDetalleMora = $rowCuotasConMora["id_det_credito"];
+
+					if (($valor_abono - ($valorMora - $abonoMora)) >= 0)
+					{
+						$this->db->set('abono_mora',$valorMora);
+						$this->db->set('estado_mora',"cancelado");
+						$this->db->where('id_det_credito', $idDetalleMora);
+						$this->db->update('det_credito');
+
+						$valor_abono = round($valor_abono - ($valorMora - $abonoMora),2);				
+					}else{
+						$this->db->set('abono_mora','abono_mora +'. (float)$valor_abono, FALSE);
+						$this->db->where('id_det_credito', $idDetalleMora);
+						$this->db->update('det_credito');
+
+						$valor_abono = round($valor_abono - ($valorMora - $abonoMora),2);				
+
+						break;
 					}
-				}elseif($valor_abono > 0){
+				}
+			}
+		}
+
+		log_message('error', 'VALOR ABONO DESPUES DE CUOTAS CON MORA : '.$valor_abono);
+		//Logica para cuotas pendientes a futuro si aun queda saldo
+		if($valor_abono > 0){
+			$query = $this->db->query("SELECT id_det_credito, v_cuota, abono FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente' ");
+			foreach ($query->result_array() as $row) {
+				$cuota = round($row["v_cuota"],2);
+				$abono_t = round($row["abono"],2);
+				$id_det_credito_t = $row["id_det_credito"];
+
+				
+				if (! $sinliquidar)
+				{			
+					$this->db->set('estado',"cancelado");
+					$this->db->where('id_det_credito', $id_det_credito_t);
+					$this->db->update('det_credito');
+
+				}
+				if (($valor_abono - ($cuota - $abono_t)) >= 0)
+				{
+					$this->db->set('abono',$cuota);
+					$this->db->set('estado',"cancelado");
+					$this->db->set('fechaabono',date("Y/m/d"));
+					$this->db->where('id_det_credito', $id_det_credito_t);
+					$this->db->update('det_credito');
+
+					$valor_abono = round($valor_abono - ($cuota - $abono_t),2);				
+				}
+				else
+				{
 					$this->db->set('abono','abono +'. (float)$valor_abono, FALSE);
 					$this->db->set('fechaabono',date("Y/m/d"));
 					$this->db->where('id_det_credito', $id_det_credito_t);
@@ -963,12 +1005,9 @@ class Validacion_model extends CI_Model {
 
 					$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
 							
-					break;		
-				}else{
-					break;
-				}
-			}	
-			//Proceso 		
+					break;			
+				}			
+			}
 		}
 
 		
@@ -2085,6 +2124,8 @@ class Validacion_model extends CI_Model {
 			foreach ($result->result_array() as $row) {
 				$saldo = $row['v_cuota']-$row['abono'];
 				$moraActual = $row['valor_mora'];
+				$saldoMora = round($row['valor_mora']-$row['abono_mora'], 2);
+				$diasMoraActual = $row['dias_mora'];
 				$saldoTotal = $saldo+$saldoTotal+$moraActual;
 				if($row['n_cuota'] == 0){
 					$detalleString = $detalleString.'*Mora Prestamo*'.'%0A';
@@ -2096,8 +2137,9 @@ class Validacion_model extends CI_Model {
 					$i++;
 				}
 				$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
-				$detalleString = $detalleString.'- Mora cuota : $'.$moraActual.'%0A';
-				$detalleString = $detalleString.'- Saldo: $'.($saldo+$moraActual).'%0A';
+				$detalleString = $detalleString.'- Días atrasados : '.$diasMoraActual.'%0A';
+				$detalleString = $detalleString.'- Mora : $'.$saldoMora.'%0A';
+				$detalleString = $detalleString.'- Saldo: $'.($saldo+$saldoMora).'%0A';
 				$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
 			}
 	
