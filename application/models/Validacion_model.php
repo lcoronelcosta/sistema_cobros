@@ -441,7 +441,7 @@ class Validacion_model extends CI_Model {
 			CC.totalpagado, 
 			CASE 
 			    WHEN CC.aplica_calculo_por_cuota = 1 THEN 
-					FORMAT((CC.totalapagar - CC.totalpagado + CC.mora), 2)
+					FORMAT((CC.totalapagar - CC.totalpagado), 2) -- Se quito por que ahora acumula en totalapagar
 				ELSE
 					FORMAT((CC.totalapagar - CC.totalpagado), 2)
 				END AS saldo_total,
@@ -654,8 +654,8 @@ class Validacion_model extends CI_Model {
 			WHERE cc.id_cab_credito = (
 				SELECT id_cab_credito FROM det_credito 
 					WHERE dc.dias_mora > 0 
-					AND cc.estado = 'pendiente'
-					AND (dc.estado = 'pendiente' OR dc.dias_mora > 0)
+					-- AND cc.estado = 'pendiente'
+					-- AND (dc.estado = 'pendiente' OR dc.dias_mora > 0)
 					AND id_det_credito = " . $id_det_credito . ")"
 		);
 		return $result;	
@@ -1867,6 +1867,7 @@ class Validacion_model extends CI_Model {
 
 			//Actualiza mora Cabecera Credito
 			$this->db->set('mora',$moraTotalPorPresamo);
+			$this->db->set('totalapagar', ($rowCabecera['valor']+$rowCabecera['interes']+$moraTotalPorPresamo));
 			$this->db->where('id_cab_credito', $rowCabecera['id_cab_credito']);
 			$this->db->update('cab_credito');
 
