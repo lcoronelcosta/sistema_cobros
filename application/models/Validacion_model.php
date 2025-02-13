@@ -2148,7 +2148,7 @@ class Validacion_model extends CI_Model {
 				$moraActual = $row['valor_mora'];
 				$saldoMora = round($row['valor_mora']-$row['abono_mora'], 2);
 				$diasMoraActual = $row['dias_mora'];
-				$saldoTotal = $saldo+$saldoTotal+$moraActual;
+				$saldoTotal = $saldo+$saldoTotal+$saldoMora;
 				if($row['n_cuota'] == 0){
 					$detalleString = $detalleString.'*Mora Prestamo*'.'%0A';
 					$detalleString = $detalleString.'- Días: '.$diasMora.'%0A';
