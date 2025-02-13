@@ -409,6 +409,7 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/
+		$this->db->query("SET time_zone = '-05:00'");
 		$result = $this->db->query("SELECT 
 			DC.id_det_credito,
 			CI.nombre,
@@ -420,13 +421,30 @@ class Validacion_model extends CI_Model {
 			FORMAT(round(DC.v_cuota - DC.abono), 2) as cuota_pendiente,
 			CONCAT(CC.d_mora, 'D-', '$', FORMAT((CC.mora), 2)) as mora_pendiente,
 			CONCAT(CC.d_mora, 'D') as dias_mora,
+			case when (DATEDIFF(CURDATE(),CC.fecha_f)) > 0 then (DATEDIFF(CURDATE(),CC.fecha_f)) ELSE 0 END AS dias_mora_nuevo,
+			CASE 
+			    WHEN CC.aplica_calculo_por_cuota = 1 THEN 
+			        CASE 
+			            WHEN (DATEDIFF(CURDATE(), CC.fecha_f)) > 0 THEN 
+			                CONCAT((DATEDIFF(CURDATE(), CC.fecha_f)), 'D-', FORMAT((CC.mora), 2)) 
+			            ELSE 
+			                CONCAT('0D-', '0') 
+			        END
+			    ELSE 
+			        CONCAT(CC.d_mora, 'D-', FORMAT(CC.mora, 2))
+			END AS nueva_mora,
 			FORMAT((CC.mora), 2) as mora_total,
 			CC.d_mora,
 			CC.fecha_i,
 			CC.mora,
 			CC.totalapagar,
 			CC.totalpagado, 
-			FORMAT((CC.totalapagar - CC.totalpagado), 2) as saldo_total,
+			CASE 
+			    WHEN CC.aplica_calculo_por_cuota = 1 THEN 
+					FORMAT((CC.totalapagar - CC.totalpagado + CC.mora), 2)
+				ELSE
+					FORMAT((CC.totalapagar - CC.totalpagado), 2)
+				END AS saldo_total,
 			(SELECT round(sum(DC1.v_cuota - DC1.abono),2) 
 				FROM cliente CI1, cab_credito CC1, det_credito DC1 
 				WHERE CI1.id_cliente=CC1.id_cliente 
@@ -441,6 +459,7 @@ class Validacion_model extends CI_Model {
 				and DC.estado='pendiente' 
 				and DC.fecha_recordatorio = '". $this->input->post('fecha_i'). "' 
 				and DC.n_cuota !=0 
+				-- GROUP BY CC.id_cab_credito, DC.id_det_credito
 				order by CI.antecesor");
 
 
@@ -1834,19 +1853,22 @@ class Validacion_model extends CI_Model {
 				AND cc.id_cab_credito = ".$rowCabecera['id_cab_credito']."
 				ORDER BY dc.id_cab_credito DESC, dc.n_cuota DESC");
 
-			if($rowCabecera['id_cab_credito'] == '7483'){
-				log_message('error', json_encode($queryDetalleCreditos));
-
-			}
-
 			$lastDetalle = array();
+			$moraTotalPorPresamo = 0.00;
 			foreach ($queryDetalleCreditos->result_array() as $row) {
 				$lastDetalle = $queryDetalleCreditos->result_array()[0];
 				$this->db->set('dias_mora',($row['d_vencidos']>0)? $row['d_vencidos']:0);
+				$moraDetalle = ($row['d_vencidos']>0) ? round(($row['interes_porcentaje']*$row['d_vencidos']), 2) : 0;
+				$moraTotalPorPresamo = round(($moraTotalPorPresamo + $moraDetalle) , 2);
 				$this->db->set('valor_mora',($row['d_vencidos']>0) ? round(($row['interes_porcentaje']*$row['d_vencidos']), 2) : 0);
 				$this->db->where('id_det_credito', $row['id_det_credito']);
 				$this->db->update('det_credito');
 			}
+
+			//Actualiza mora Cabecera Credito
+			$this->db->set('mora',$moraTotalPorPresamo);
+			$this->db->where('id_cab_credito', $rowCabecera['id_cab_credito']);
+			$this->db->update('cab_credito');
 
 			if($rowCabecera['d_vencidos'] > 0){
 				$this->db->set('dias_mora',($rowCabecera['d_vencidos']));

@@ -378,7 +378,7 @@ date_default_timezone_set('America/Bogota');
 						</tr>
 						<tr>
 							<td>Saldo a pagar: </td>
-							<td><input type="text" readonly="true" id="saldo" name="saldo" value="$ <?php echo ($totalapagar - $totalpagado)?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
+							<td><input type="text" readonly="true" id="saldo" name="saldo" value="$ <?php $saldoAux = ($aplica_calculo_por_cuota) ? ($totalapagar - $totalpagado + $mora) : ($totalapagar - $totalpagado);  echo ($saldoAux)?>" required maxlength="10" onkeypress="return numeros(event)" style="height: 30px;width: 70%;text-align:center; font-size: 14px;border-color:gray;border-width:thin;line-height: 20px" /></td>
 						</tr>
 						<tr>
 							<td colspan="2">

@@ -654,7 +654,7 @@ date_default_timezone_set('America/Bogota');?>
 						//{"data": "mora_pendiente"},
 						{"render":
 							function ( data, type, row ) {
-								return `${row['dias_mora']}<br>${row['mora_total']}` 				         					
+								return `${ row['nueva_mora'].split("-")[0]}<br>${row['nueva_mora'].split("-")[1]}` 				         					
 							}
 						},
 						{"data": "saldo_total"},
