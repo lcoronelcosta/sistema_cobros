@@ -837,6 +837,7 @@ class Validacion_model extends CI_Model {
 	      		//****************************************************************************
 	      		if (($saldo_liquidar-$mora)>0)
 	      		{
+					log_message('info', 'saldo a liquidar IF 1 : '.$saldo_liquidar.'--'.$mora);
 	      			//********************************************************************
 	      			//Inserto la MORA al gasto para que sea validado por el administrador
 	      			//********************************************************************
@@ -855,6 +856,7 @@ class Validacion_model extends CI_Model {
 	      		{
 	      			if (($saldo_liquidar-$mora)<0)
 	      			{
+						log_message('info', 'saldo a liquidar IF 2 : '.$saldo_liquidar.'--'.$mora);
 	      				$this->validacion_model->registrar_gasto_mora($id_cobrador, $saldo_liquidar, $id_cab_credito, $cliente);
 
 	      				$comision_mora = round((($mora - $saldo_liquidar) * $porcentaje_comision) / 100, 2);
@@ -870,6 +872,7 @@ class Validacion_model extends CI_Model {
 	      			}
 	      			else
 	      			{
+						log_message('info', 'saldo a liquidar ELSE  : '.$saldo_liquidar.'--'.$mora);
 	      				$this->validacion_model->registrar_gasto_mora($id_cobrador, $mora, $id_cab_credito, $cliente);
 
 	      				//*************************************
@@ -1034,9 +1037,17 @@ class Validacion_model extends CI_Model {
 		if ($valor_abono >= 0 and $sinliquidar)
 		{
 			
-			$this->db->set('estado',"cancelado");
-      		$this->db->where('id_cab_credito', $id_cab_credito);
-      		$this->db->update('cab_credito');
+			$queryTotalCuotasPendiente = $this->db->query("SELECT SUM(v_cuota-abono) AS total FROM det_credito WHERE id_cab_credito = " . $id_cab_credito . ";");
+			if(count($queryTotalCuotasPendiente->result_array()) > 0 ){
+				if($row["total"] <= 0 || !$sinliquidar){
+					$this->db->set('estado',"cancelado");
+					$this->db->where('id_cab_credito', $id_cab_credito);
+					$this->db->update('cab_credito');
+				}
+			}
+			
+
+
 
 			//**************************************************************************************
 			//D�bito al cobrador porque liquid� la cuenta, pero a�n ten�a saldo por cobrar
