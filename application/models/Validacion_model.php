@@ -1039,7 +1039,7 @@ class Validacion_model extends CI_Model {
 			
 			$queryTotalCuotasPendiente = $this->db->query("SELECT SUM(v_cuota-abono) AS total FROM det_credito WHERE id_cab_credito = " . $id_cab_credito . ";");
 			if(count($queryTotalCuotasPendiente->result_array()) > 0 ){
-				if($row[0]["total"] <= 0 || !$sinliquidar){
+				if($row[0]["total"] <= 0){
 					$this->db->set('estado',"cancelado");
 					$this->db->where('id_cab_credito', $id_cab_credito);
 					$this->db->update('cab_credito');
