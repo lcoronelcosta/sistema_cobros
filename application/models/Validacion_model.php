@@ -485,6 +485,7 @@ class Validacion_model extends CI_Model {
 		/*
 		Se conecta con una llama del Script por AJAX
 		*/
+		$this->db->query("SET time_zone = '-05:00'");
 		$result = $this->db->query("SELECT min(DC.id_det_credito) AS id_det_credito, 
 			CI.nombre, 
 			CI.apellido, 
@@ -495,6 +496,17 @@ class Validacion_model extends CI_Model {
 			FORMAT(round(DC.v_cuota - DC.abono), 2) as cuota_pendiente,
 			CONCAT(CC.d_mora, 'D-', '$', FORMAT((CC.mora), 2)) as mora_pendiente,
 			CONCAT(CC.d_mora, 'D') as dias_mora,
+			CASE 
+			    WHEN CC.aplica_calculo_por_cuota = 1 THEN 
+			        CASE 
+			            WHEN (DATEDIFF(CURDATE(), CC.fecha_f)) > 0 THEN 
+			                CONCAT((DATEDIFF(CURDATE(), CC.fecha_f)), 'D-', FORMAT((CC.mora), 2)) 
+			            ELSE 
+			                CONCAT('0D-', '0') 
+			        END
+			    ELSE 
+			        CONCAT(CC.d_mora, 'D-', FORMAT(CC.mora, 2))
+			END AS nueva_mora,
 			FORMAT((CC.mora), 2) as mora_total,
 			CC.fecha_i, 
 			CC.d_mora, 
