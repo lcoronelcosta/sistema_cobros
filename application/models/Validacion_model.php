@@ -1039,12 +1039,11 @@ class Validacion_model extends CI_Model {
 			
 			$queryTotalCuotasPendiente = $this->db->query("SELECT SUM(v_cuota-abono) AS total FROM det_credito WHERE id_cab_credito = " . $id_cab_credito . ";");
 			if(count($queryTotalCuotasPendiente->result_array()) > 0 ){
-				if($row[0]["total"] <= 0){
+				if($queryTotalCuotasPendiente->result_array()[0]["total"] <= 0 || !$sinliquidar){
 					$this->db->set('estado',"cancelado");
 					$this->db->where('id_cab_credito', $id_cab_credito);
 					$this->db->update('cab_credito');
-					return 0;
-				}else{
+					
 					//**************************************************************************************
 					//D�bito al cobrador porque liquid� la cuenta, pero a�n ten�a saldo por cobrar
 					//**************************************************************************************			
