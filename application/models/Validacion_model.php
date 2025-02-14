@@ -1039,23 +1039,22 @@ class Validacion_model extends CI_Model {
 			
 			$queryTotalCuotasPendiente = $this->db->query("SELECT SUM(v_cuota-abono) AS total FROM det_credito WHERE id_cab_credito = " . $id_cab_credito . ";");
 			if(count($queryTotalCuotasPendiente->result_array()) > 0 ){
-				if($row["total"] <= 0 || !$sinliquidar){
+				if($row[0]["total"] <= 0 || !$sinliquidar){
 					$this->db->set('estado',"cancelado");
 					$this->db->where('id_cab_credito', $id_cab_credito);
 					$this->db->update('cab_credito');
+					return 0;
+				}else{
+					//**************************************************************************************
+					//D�bito al cobrador porque liquid� la cuenta, pero a�n ten�a saldo por cobrar
+					//**************************************************************************************			
+					$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valor,'C',"COMISION");
+					$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$comision_mora_completo,'C',"COMISION");
+					$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valor_abono,'C',"SOBRANTE");
+					return 1;
 				}
 			}
-			
-
-
-
-			//**************************************************************************************
-			//D�bito al cobrador porque liquid� la cuenta, pero a�n ten�a saldo por cobrar
-			//**************************************************************************************			
-			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valor,'C',"COMISION");
-			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$comision_mora_completo,'C',"COMISION");
-			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valor_abono,'C',"SOBRANTE");
-			return 1;
+			return 0;
 		}
 		else
 		{
