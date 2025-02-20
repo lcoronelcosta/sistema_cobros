@@ -418,7 +418,7 @@ class Validacion_model extends CI_Model {
 			CI.celular,
 			round(DC.v_cuota,2) as v_cuota,
 			round(DC.abono,2) as abono,
-			FORMAT(round(DC.v_cuota - DC.abono), 2) as cuota_pendiente,
+			FORMAT((DC.v_cuota - DC.abono), 2) as cuota_pendiente,
 			CONCAT(CC.d_mora, 'D-', '$', FORMAT((CC.mora), 2)) as mora_pendiente,
 			CONCAT(CC.d_mora, 'D') as dias_mora,
 			case when (DATEDIFF(CURDATE(),CC.fecha_f)) > 0 then (DATEDIFF(CURDATE(),CC.fecha_f)) ELSE 0 END AS dias_mora_nuevo,
@@ -493,7 +493,7 @@ class Validacion_model extends CI_Model {
 			CI.celular,
 			round(DC.v_cuota,2) as v_cuota, 
 			round(DC.abono,2) as abono, 
-			FORMAT(round(DC.v_cuota - DC.abono), 2) as cuota_pendiente,
+			FORMAT((DC.v_cuota - DC.abono), 2) as cuota_pendiente,
 			CONCAT(CC.d_mora, 'D-', '$', FORMAT((CC.mora), 2)) as mora_pendiente,
 			CONCAT(CC.d_mora, 'D') as dias_mora,
 			CASE 
