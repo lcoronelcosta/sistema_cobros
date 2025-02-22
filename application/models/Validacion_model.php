@@ -834,6 +834,7 @@ class Validacion_model extends CI_Model {
 
 		//Proceso de abono al credito
 		$abono = $this->abonarAlDetalleCredito($id_cab_credito, $valor_abono);
+
 		//Obtener el total pendiente del credito
 		$queryValorPendiente 	= $this->db->query("SELECT 
 											FORMAT(totalapagar,2) AS totalAPagarConMora,
@@ -852,8 +853,14 @@ class Validacion_model extends CI_Model {
 		$tieneSobrantes			= ($totalPagado > $totalAPagarConMora) ? true : false;
 		$valorFaltante			= $totalAPagarSinMora - $totalPagado;
 
+
+
 		//Aplica Faltante
-		if(!$considerarMora && ($liquidar == "true" || $liquidar)){
+
+		log_message('info', 'VALOR LIQUIDAR : '.$liquidar);
+		log_message('info', 'considerarMora : '.$considerarMora);
+
+		if(!$considerarMora && ($liquidar == "true")){
 			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
 			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valorFaltante,'F',"FALTANTE");
 		}
@@ -870,7 +877,7 @@ class Validacion_model extends CI_Model {
 		}
 
 		//Cerrar Prestamo
-		if($puedeLiquidarCredito || ($liquidar == "true" || $liquidar)){
+		if($puedeLiquidarCredito || ($liquidar == "true")){
 			$this->db->set('estado',"cancelado");
 			$this->db->where('id_cab_credito', $id_cab_credito);
 			$this->db->update('cab_credito');
