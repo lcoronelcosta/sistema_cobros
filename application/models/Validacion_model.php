@@ -758,7 +758,231 @@ class Validacion_model extends CI_Model {
 		return $fecha;
 	}
 
-	public function abonar_al_credito($id_cobrador, $porcentaje_comision)
+	public function deleteAbonoBackup($id_abono, $id_cab_credito){
+		$result = $this->db->query("SELECT fecha, valor FROM abono WHERE id_abono = $id_abono");
+		$data = $result->row_array();
+		$pagoOld = $data['valor'];
+		$fecha = $data['fecha'];
+
+		$this->db->query("DELETE FROM abono WHERE id_abono = $id_abono");
+		$this->db->query("UPDATE cab_credito SET totalpagado = (totalpagado-$pagoOld), estado = 'pendiente' WHERE id_cab_credito = $id_cab_credito");
+		$this->db->query("DELETE FROM liquidacion WHERE id_cab_credito = $id_cab_credito");
+
+		$query = $this->db->query("SELECT * FROM det_credito where id_cab_credito = $id_cab_credito AND abono > 0 ORDER BY id_det_credito DESC");
+		foreach ($query->result_array() as $row) {
+			$abonoActual = round($row["abono"],2);
+			$pagoOld = $pagoOld - $abonoActual;
+
+			if($pagoOld > 0){
+				$this->db->query("UPDATE det_credito SET abono = 0, estado = 'pendiente', fechaabono = NULL WHERE id_det_credito = ".$row['id_det_credito']);
+			}else if($pagoOld <= 0){
+				$pago = abs($pagoOld);
+				$estado = ($pago < round($row["v_cuota"],2)) ? 'pendiente' : 'cancelado';
+				$this->db->query("UPDATE det_credito SET abono = $pago, estado = '".$estado."' WHERE id_det_credito = ".$row['id_det_credito']);
+				break;
+			}
+		}
+		return $fecha;
+	}
+
+	public function abonar_al_credito($id_cobrador, $porcentaje_comision){
+		$edit 			= $this->input->post('edit');
+		$id_cab_credito = $this->input->post('id_cab_credito');
+		$fecha 			= date("Y/m/d");
+		if($edit == "true"){
+			$valor_abono = $this->input->post('valor_abono');
+			$id_abono = $this->input->post('id_abono');
+			$result = $this->db->query("SELECT fecha, valor FROM abono WHERE id_abono = $id_abono");
+			$fecha = $this->deleteAbono($id_abono, $id_cab_credito);
+		}
+
+		//Actualiza la cabecera con el nuevo total de pago
+		$id_det_credito = $this->input->post('id_det_credito');
+		$valor_abono 	= $this->input->post('valor_abono');
+		$liquidar 		= !is_null($this->input->post('liquidar')) ? $this->input->post('liquidar') : false;
+
+      	$this->db->set('totalpagado','totalpagado +'. (float)$valor_abono, FALSE);
+      	$this->db->where('id_cab_credito', $id_cab_credito);
+      	$this->db->update('cab_credito');
+
+		//Inserta el Abono
+		$dataabono = array(                          
+			'id_cab_credito' => $id_cab_credito,
+			'valor' => $valor_abono,
+			'fecha' => $fecha,
+			'id_usuario' => $id_cobrador);
+		$this->db->insert('abono', $dataabono);
+
+		//Obtener Informacion del cliente
+		$queryInfoCliente 	= $this->db->query("SELECT concat('MORA: ',c.nombre, ' ', c.apellido) as nombre 
+								FROM cliente c, cab_credito cc 
+								WHERE cc.id_cliente = c.id_cliente AND cc.id_cab_credito = " . $id_cab_credito . " ");
+		$resultInfoCliente 	= $queryInfoCliente->row_array();
+		$cliente 			= $resultInfoCliente['nombre'];
+
+		//Obtener Informacion del prestamo //Ya el saldo tiene incluido el valor abonado
+		$queryValorPendiente = $this->db->query("SELECT (cc.totalapagar-cc.totalpagado) as saldo, cc.interes, cc.mora 
+			FROM cab_credito cc 
+			where cc.id_cab_credito = " . $id_cab_credito . " ");
+
+		$resultValoresPendientes 	= $queryValorPendiente->row_array();
+		$saldo_liquidar 			= $resultValoresPendientes['saldo'];
+		$interes 					= $resultValoresPendientes['interes'];
+		$mora 						= $resultValoresPendientes['mora'];
+      	$valor 						= round(($interes * $porcentaje_comision) / 100, 2);
+      	$comision_mora 				= round(($mora * $porcentaje_comision) / 100, 2);
+
+		//Proceso de abono al credito
+		$abono = $this->abonarAlDetalleCredito($id_cab_credito, $valor_abono);
+		//Obtener el total pendiente del credito
+		$queryValorPendiente 	= $this->db->query("SELECT 
+											FORMAT(totalapagar,2) AS totalAPagarConMora,
+											FORMAT(totalpagado, 2) AS totalPagado,
+											FORMAT(SUM(valor+interes),2) AS totalAPagarSinMora,
+											FORMAT(SUM(totalapagar-totalpagado),2) AS totalPendiente,
+											FORMAT(SUM((totalpagado-totalapagar)+mora),2) AS moraRealPagada 
+										FROM cab_credito WHERE id_cab_credito = " . $id_cab_credito . " ");
+		$totalPendiente  		= $queryValorPendiente->result_array()[0]["totalPendiente"];
+		$moraRealPagada  		= $queryValorPendiente->result_array()[0]["moraRealPagada"];
+		$totalPagado  			= $queryValorPendiente->result_array()[0]["totalPagado"];
+		$totalAPagarSinMora  	= $queryValorPendiente->result_array()[0]["totalAPagarSinMora"];
+		$totalAPagarConMora  	= $queryValorPendiente->result_array()[0]["totalAPagarConMora"];
+		$considerarMora			= ($totalPagado <= $totalAPagarSinMora) ? false : true;
+		$puedeLiquidarCredito	= ($totalPagado >= $totalAPagarSinMora) ? true : false;
+		$tieneSobrantes			= ($totalPagado > $totalAPagarConMora) ? true : false;
+		$valorFaltante			= $totalAPagarSinMora - $totalPagado;
+
+		//Aplica Faltante
+		if(!$considerarMora && ($liquidar == "true" || $liquidar)){
+			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
+			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valorFaltante,'F',"FALTANTE");
+		}
+
+		if($puedeLiquidarCredito){
+			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
+			$moraRealPagada = ($tieneSobrantes) ? $mora : $moraRealPagada;
+			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$moraRealPagada,'C',"COMISION");
+		}
+
+		if($tieneSobrantes){
+			$sobrante = $totalPagado-$totalAPagarConMora;
+			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$sobrante,'C',"SOBRANTE");
+		}
+
+		//Cerrar Prestamo
+		if($puedeLiquidarCredito || ($liquidar == "true" || $liquidar)){
+			$this->db->set('estado',"cancelado");
+			$this->db->where('id_cab_credito', $id_cab_credito);
+			$this->db->update('cab_credito');
+
+			$this->db->set('estado',"cancelado");
+			$this->db->set('estado_mora',"cancelado");
+			$this->db->where('id_cab_credito', $id_cab_credito);
+			$this->db->update('det_credito');
+		}
+	}
+
+	private function abonarAlDetalleCredito($id_cab_credito, $valor_abono){
+		//Logica solo abonos sin moras
+		log_message('info', 'VALOR ABONO ANTES DE CUOTAS CON MORA : '.$valor_abono. ' CON ID_CREDITO: '.$id_cab_credito);
+		$query = $this->db->query("SELECT id_det_credito, v_cuota, abono FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente' AND fechapago <= DATE(NOW()) ");
+		foreach ($query->result_array() as $row) {
+			$cuota				= round($row["v_cuota"],2);
+			$abono_t 			= round($row["abono"],2);
+			$id_det_credito_t 	= $row["id_det_credito"];
+
+			if (($valor_abono - ($cuota - $abono_t)) >= 0){
+				$this->db->set('abono',$cuota);
+				$this->db->set('estado',"cancelado");
+				$this->db->set('fechaabono',date("Y/m/d"));
+				$this->db->where('id_det_credito', $id_det_credito_t);
+				$this->db->update('det_credito');
+
+				$valor_abono = round($valor_abono - ($cuota - $abono_t),2);				
+			}
+			else
+			{
+				$this->db->set('abono','abono +'. (float)$valor_abono, FALSE);
+				$this->db->set('fechaabono',date("Y/m/d"));
+				$this->db->where('id_det_credito', $id_det_credito_t);
+				$this->db->update('det_credito');
+
+				$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
+						
+				break;			
+			}	
+		}
+
+		//Logica para las mora a nivel de cuotas
+		log_message('info', 'VALOR ABONO DEPUES DE CUOTAS CON MORA : '.$valor_abono. ' CON ID_CREDITO: '.$id_cab_credito);
+		if($valor_abono > 0){
+			$queryCuotasConMora = $this->db->query("SELECT id_det_credito, v_cuota, abono, valor_mora, abono_mora FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.valor_mora > 0 and dc.estado_mora = 'pendiente' ORDER BY n_cuota ASC");
+			if(count($queryCuotasConMora->result_array()) > 0 && $valor_abono > 0){
+				foreach ($queryCuotasConMora->result_array() as $rowCuotasConMora) {
+					$valorMora = round($rowCuotasConMora["valor_mora"],2);
+					$abonoMora = round($rowCuotasConMora["abono_mora"],2);
+					$idDetalleMora = $rowCuotasConMora["id_det_credito"];
+
+					if (($valor_abono - ($valorMora - $abonoMora)) >= 0)
+					{
+						$this->db->set('abono_mora',$valorMora);
+						$this->db->set('estado_mora',"cancelado");
+						$this->db->where('id_det_credito', $idDetalleMora);
+						$this->db->update('det_credito');
+
+						$valor_abono = round($valor_abono - ($valorMora - $abonoMora),2);				
+					}else{
+						$this->db->set('abono_mora','abono_mora +'. (float)$valor_abono, FALSE);
+						$this->db->where('id_det_credito', $idDetalleMora);
+						$this->db->update('det_credito');
+
+						$valor_abono = round($valor_abono - ($valorMora - $abonoMora),2);				
+
+						break;
+					}
+				}
+			}
+		}
+
+		//Logica para cuotas pendientes a futuro si aun queda saldo
+		log_message('info', 'VALOR ABONO LUEGO DE CANCELAR LA MORA DE CUOTAS : '.$valor_abono. ' CON ID_CREDITO: '.$id_cab_credito);
+		if($valor_abono > 0){
+			$query = $this->db->query("SELECT id_det_credito, v_cuota, abono FROM det_credito dc WHERE dc.id_cab_credito = " . $id_cab_credito . " and dc.estado='pendiente' ");
+			foreach ($query->result_array() as $row) {
+				$cuota = round($row["v_cuota"],2);
+				$abono_t = round($row["abono"],2);
+				$id_det_credito_t = $row["id_det_credito"];
+
+				if (($valor_abono - ($cuota - $abono_t)) >= 0)
+				{
+					$this->db->set('abono',$cuota);
+					$this->db->set('estado',"cancelado");
+					$this->db->set('fechaabono',date("Y/m/d"));
+					$this->db->where('id_det_credito', $id_det_credito_t);
+					$this->db->update('det_credito');
+
+					$valor_abono = round($valor_abono - ($cuota - $abono_t),2);				
+				}
+				else
+				{
+					$this->db->set('abono','abono +'. (float)$valor_abono, FALSE);
+					$this->db->set('fechaabono',date("Y/m/d"));
+					$this->db->where('id_det_credito', $id_det_credito_t);
+					$this->db->update('det_credito');
+
+					$valor_abono = round($valor_abono - ($cuota - $abono_t),2);
+							
+					break;			
+				}			
+			}
+		}
+
+		return $valor_abono;
+	}
+
+
+
+	public function abonar_al_creditoBackup($id_cobrador, $porcentaje_comision)
 	{
 		$edit = $this->input->post('edit');
 		$id_cab_credito = $this->input->post('id_cab_credito');
@@ -923,6 +1147,8 @@ class Validacion_model extends CI_Model {
 	    
 	    $this->db->insert('liquidacion', $registro);	
 	}
+
+
 
 	public function abonar_al_credito_detalle($id_cab_credito, $valor_abono, $id_cobrador, $valor, $sinliquidar, $comision_mora_completo)
 	{
