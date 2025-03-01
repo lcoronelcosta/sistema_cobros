@@ -859,16 +859,24 @@ class Validacion_model extends CI_Model {
 
 		log_message('info', 'VALOR LIQUIDAR : '.$liquidar);
 		log_message('info', 'considerarMora : '.$considerarMora);
+		$liquidoInteres = false;
 
 		if(!$considerarMora && ($liquidar == "true")){
 			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
-			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valorFaltante,'F',"FALTANTE");
+			if($valorFaltante > 0){
+				$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valorFaltante,'F',"FALTANTE");
+			}
+			$liquidoInteres = true;
 		}
 
 		if($puedeLiquidarCredito){
-			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
+			if(!$liquidoInteres){
+				$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
+			}
 			$moraRealPagada = ($tieneSobrantes) ? $mora : $moraRealPagada;
-			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$moraRealPagada,'C',"COMISION");
+			if($moraRealPagada > 0){
+				$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$moraRealPagada,'C',"COMISION");
+			}
 		}
 
 		if($tieneSobrantes){
