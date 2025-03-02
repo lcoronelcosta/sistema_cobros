@@ -843,15 +843,15 @@ class Validacion_model extends CI_Model {
 											FORMAT(SUM(totalapagar-totalpagado),2) AS totalPendiente,
 											FORMAT(SUM((totalpagado-totalapagar)+mora),2) AS moraRealPagada 
 										FROM cab_credito WHERE id_cab_credito = " . $id_cab_credito . " ");
-		$totalPendiente  		= $queryValorPendiente->result_array()[0]["totalPendiente"];
-		$moraRealPagada  		= $queryValorPendiente->result_array()[0]["moraRealPagada"];
-		$totalPagado  			= $queryValorPendiente->result_array()[0]["totalPagado"];
-		$totalAPagarSinMora  	= $queryValorPendiente->result_array()[0]["totalAPagarSinMora"];
-		$totalAPagarConMora  	= $queryValorPendiente->result_array()[0]["totalAPagarConMora"];
+		$totalPendiente  		= (float) $queryValorPendiente->result_array()[0]["totalPendiente"];
+		$moraRealPagada  		= (float) $queryValorPendiente->result_array()[0]["moraRealPagada"];
+		$totalPagado  			= (float) $queryValorPendiente->result_array()[0]["totalPagado"];
+		$totalAPagarSinMora  	= (float) $queryValorPendiente->result_array()[0]["totalAPagarSinMora"];
+		$totalAPagarConMora  	= (float) $queryValorPendiente->result_array()[0]["totalAPagarConMora"];
 		$considerarMora			= ($totalPagado <= $totalAPagarSinMora) ? false : true;
 		$puedeLiquidarCredito	= ($totalPagado >= $totalAPagarSinMora) ? true : false;
 		$tieneSobrantes			= ($totalPagado > $totalAPagarConMora) ? true : false;
-		$valorFaltante			= $totalAPagarSinMora - $totalPagado;
+		$valorFaltante			= (float) ($totalAPagarSinMora - $totalPagado);
 
 
 
