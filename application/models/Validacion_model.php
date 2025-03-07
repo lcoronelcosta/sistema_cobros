@@ -843,49 +843,74 @@ class Validacion_model extends CI_Model {
 											FORMAT(SUM(totalapagar-totalpagado),2) AS totalPendiente,
 											FORMAT(SUM((totalpagado-totalapagar)+mora),2) AS moraRealPagada 
 										FROM cab_credito WHERE id_cab_credito = " . $id_cab_credito . " ");
-		$totalPendiente  		= (float) $queryValorPendiente->result_array()[0]["totalPendiente"];
-		$moraRealPagada  		= (float) $queryValorPendiente->result_array()[0]["moraRealPagada"];
-		$totalPagado  			= (float) $queryValorPendiente->result_array()[0]["totalPagado"];
-		$totalAPagarSinMora  	= (float) $queryValorPendiente->result_array()[0]["totalAPagarSinMora"];
-		$totalAPagarConMora  	= (float) $queryValorPendiente->result_array()[0]["totalAPagarConMora"];
-		$considerarMora			= ($totalPagado <= $totalAPagarSinMora) ? false : true;
-		$puedeLiquidarCredito	= ($totalPagado >= $totalAPagarSinMora) ? true : false;
-		$tieneSobrantes			= ($totalPagado > $totalAPagarConMora) ? true : false;
-		$valorFaltante			= (float) ($totalAPagarSinMora - $totalPagado);
+		$totalPendiente  		= (float) str_replace(',', '',  $queryValorPendiente->result_array()[0]["totalPendiente"]);
+		$moraRealPagada  		= (float) str_replace(',', '', $queryValorPendiente->result_array()[0]["moraRealPagada"]);
+		$totalPagado  			= (float) str_replace(',', '', $queryValorPendiente->result_array()[0]["totalPagado"]);
+		$totalAPagarSinMora  	= (float) str_replace(',', '', $queryValorPendiente->result_array()[0]["totalAPagarSinMora"]);
+		$totalAPagarConMora  	= (float) str_replace(',', '', $queryValorPendiente->result_array()[0]["totalAPagarConMora"]);
+		$considerarMora			= ($totalPagado >= $totalAPagarSinMora) ? 'true' : 'false';
+		$puedeLiquidarCredito	= ($totalPagado >= $totalAPagarSinMora) ? 'true' : 'false';
+		$tieneSobrantes			= ($totalPagado > $totalAPagarConMora) ? 'true' : 'false';
+		$valorFaltante			= (float) str_replace(',', '', ($totalAPagarSinMora - $totalPagado));
 
-
-
-		//Aplica Faltante
-
+		log_message('info', '-------------------- PRESTAMO ID : '.$id_cab_credito);
+		log_message('info', '------------------ VALORES DE VARIABLES DE CALCULO PRESTAMO  -----------------------');
+		log_message('info', '---------- totalPendiente ----------['. $totalPendiente.']');
+		log_message('info', '---------- moraRealPagada ----------['. $moraRealPagada.']');
+		log_message('info', '---------- totalAPagarSinMora ------['. $totalAPagarSinMora.']');
+		log_message('info', '---------- totalAPagarConMora ------['. $totalAPagarConMora.']');
+		log_message('info', '---------- puedeLiquidarCredito ----['. $puedeLiquidarCredito.']');
+		log_message('info', '---------- tieneSobrantes ----------['. $tieneSobrantes.']');
+		log_message('info', '---------- valorFaltante -----------['. $valorFaltante.']');
+		log_message('info', '------------------FIN VARIABLES PRESTAMO ID : '.$id_cab_credito);
+		
 		log_message('info', 'VALOR LIQUIDAR : '.$liquidar);
 		log_message('info', 'considerarMora : '.$considerarMora);
+
 		$liquidoInteres = false;
 
-		if(!$considerarMora && ($liquidar == "true")){
+		//Primero validar si puede liquidar el credito variable de liquidacion de credito
+		$liquidoCredito = 'false';
+		if($puedeLiquidarCredito == 'true' || $liquidar == "true"){
 			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
-			if($valorFaltante > 0){
-				$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valorFaltante,'F',"FALTANTE");
-			}
-			$liquidoInteres = true;
+			$liquidoCredito = 'true';
 		}
 
-		if($puedeLiquidarCredito){
-			if(!$liquidoInteres){
-				$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$interes,'C',"COMISION");
-			}
-			$moraRealPagada = ($tieneSobrantes) ? $mora : $moraRealPagada;
-			if($moraRealPagada > 0){
-				$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$moraRealPagada,'C',"COMISION");
-			}
+		log_message('info', '---------- liquidoCredito -----------'. $liquidoCredito);
+
+		//Segundo Validar si considera el ingreso por alguna mora que tiene que cobrar
+		$liquidoMoraExistente = 'false';
+		if($considerarMora == 'true'){
+			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$moraRealPagada,'C',"COMISION");
+			$liquidoMoraExistente = 'true';
 		}
 
-		if($tieneSobrantes){
+		log_message('info', '---------- liquidoMoraExistente -----------'. $liquidoMoraExistente . ' VALOR : ' . $moraRealPagada);
+
+		//Tercero valida si tiene sobrantes
+		$liquidoSobrantesExistente = 'false';
+		if($tieneSobrantes == 'true'){
 			$sobrante = $totalPagado-$totalAPagarConMora;
 			$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$sobrante,'C',"SOBRANTE");
+			$liquidoSobrantesExistente = 'true';
 		}
 
+		log_message('info', '---------- liquidoSobrantesExistente -----------'. $liquidoSobrantesExistente . ' VALOR : ' . ($totalPagado-$totalAPagarConMora));
+
+		//Cuarto Valida si liquido credito
+		$aplicoValorFaltante = 'false';
+		if($liquidoCredito == 'true'){
+			//Quinto valida si tiene faltantes
+			if($valorFaltante > 0){
+				$this->validacion_model->liquidar_cuenta($id_cobrador,$id_cab_credito,$valorFaltante,'F',"FALTANTE");
+				$aplicoValorFaltante = 'true';
+			}
+		}
+
+		log_message('info', '---------- aplicoValorFaltante -----------'. $aplicoValorFaltante . ' VALOR : ' . $valorFaltante);
+
 		//Cerrar Prestamo
-		if($puedeLiquidarCredito || ($liquidar == "true")){
+		if($liquidoCredito == 'true'){
 			$this->db->set('estado',"cancelado");
 			$this->db->where('id_cab_credito', $id_cab_credito);
 			$this->db->update('cab_credito');
@@ -895,6 +920,8 @@ class Validacion_model extends CI_Model {
 			$this->db->where('id_cab_credito', $id_cab_credito);
 			$this->db->update('det_credito');
 		}
+
+		log_message('info', '------------------FIN PROCESO PRESTAMO ID : '.$id_cab_credito);
 	}
 
 	private function abonarAlDetalleCredito($id_cab_credito, $valor_abono){
