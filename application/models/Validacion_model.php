@@ -755,6 +755,19 @@ class Validacion_model extends CI_Model {
 				break;
 			}
 		}
+
+		//Dejamos pendiente las cuotas con valor cero
+		$this->db->set('estado',"pendiente");
+		$this->db->where('id_cab_credito', $id_cab_credito);
+		$this->db->where('abono', 0);
+		$this->db->update('det_credito');
+
+		//Dejamos pendiente las moras de las cuotas con valor mayor cero
+		$this->db->set('estado_mora',"pendiente");
+		$this->db->where('id_cab_credito', $id_cab_credito);
+		$this->db->where('abono_mora <=', 0);
+		$this->db->update('det_credito');
+
 		return $fecha;
 	}
 
