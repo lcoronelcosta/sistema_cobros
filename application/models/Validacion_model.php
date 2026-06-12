@@ -1471,6 +1471,10 @@ class Validacion_model extends CI_Model {
       	$this->db->set('direccion', $this->input->post('direccion'));
       	$this->db->set('referencia', $this->input->post('referencia'));
       	$this->db->set('antecesor', $this->input->post('id_antecesor'));
+      	
+      	$result = $this->db->query("SELECT c.ruta_foto FROM cliente c WHERE c.cedula = '".$this->input->post('cedula') ."'");
+		$cliente = $result->row_array();
+		if($cliente['cedula'] != $archivo)
       	$this->db->set('ruta_foto', $archivo);
       	
       	$this->db->where('cedula', $this->input->post('cedula'));
