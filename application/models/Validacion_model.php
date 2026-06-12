@@ -1841,13 +1841,22 @@ class Validacion_model extends CI_Model {
 		//Consulta todos los creditos vencidos y actualiza la mora
 		//*****************************************************
 		$this->db->query("SET time_zone = '-05:00'");
+		//Query Prestamos SinCuota Mora
+		/*$query = $this->db->query("
+			SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos, 	
+				round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes 
+			FROM cab_credito cc 
+			WHERE cc.fecha_f < CURDATE() and cc.estado='pendiente' AND (aplica_calculo_por_cuota = 0 OR aplica_calculo_por_cuota IS NULL)
+		");*/
+
 		$query = $this->db->query("
 			SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos, 	
 				round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes 
 			FROM cab_credito cc 
 			WHERE cc.fecha_f < CURDATE() and cc.estado='pendiente' AND (aplica_calculo_por_cuota = 0 OR aplica_calculo_por_cuota IS NULL)
 		");
-
+		
+		//Query Prestamos con Aplicacion a Mora
 		$queryCabeceraCreditos = $this->db->query("
 			SELECT cc.id_cab_credito, (DATEDIFF(CURDATE(),cc.fecha_f)) as d_vencidos,
 				round(((cc.interes/cc.plazo)*(DATEDIFF(CURDATE(),cc.fecha_f))),2) as mora, cc.valor, cc.interes 
@@ -1855,6 +1864,7 @@ class Validacion_model extends CI_Model {
 			WHERE cc.fecha_i >= '2025-01-01' AND cc.aplica_calculo_por_cuota = 1 AND cc.estado = 'pendiente' AND cc.id_formadepago <> 1;
 		");
 
+		//Prestamos con Aplicacion a Mora
 		foreach ($queryCabeceraCreditos->result_array() as $rowCabecera) {
 
 			$queryDetalleCreditos = $this->db->query("
@@ -1914,9 +1924,10 @@ class Validacion_model extends CI_Model {
 			
 		}
 		
+		//Prestamos SinCuota Mora
 		foreach ($query->result_array() as $row) {
 			$d_mora = $row["d_vencidos"];
-			$mora = round($row["mora"],2);
+			$mora = 0;//round($row["mora"],2);
 			$totalapagar = $row["valor"] + $row["interes"] + $mora;
 			$id_cab_credito = $row["id_cab_credito"];
 
@@ -1948,7 +1959,7 @@ class Validacion_model extends CI_Model {
 			      	 	'estado' => "pendiente"	
 			     	);	
 			    
-			     	$this->db->insert('det_credito', $registro);
+			     	//$this->db->insert('det_credito', $registro);
 				 
 			}
 			else
@@ -2130,7 +2141,7 @@ class Validacion_model extends CI_Model {
 	/**Compartir detalle del credito actual */
 	public function compartirDetalleCredito($id_det_credito)
 	{	
-		$result = $this->db->query("SELECT cc.d_mora, cc.tasa, cc.plazo, cc.fecha_i, cc.id_formadepago, cc.valor, dc.*, c.celular FROM det_credito AS dc
+		$result = $this->db->query("SELECT cc.d_mora, cc.tasa, cc.plazo, cc.fecha_i, cc.id_formadepago, cc.valor, cc.aplica_calculo_por_cuota, dc.*, c.celular FROM det_credito AS dc
 			INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
 			INNER JOIN cliente AS c ON c.id_cliente = cc.id_cliente
 			WHERE cc.id_cab_credito = (SELECT id_cab_credito FROM det_credito WHERE id_det_credito = $id_det_credito)
