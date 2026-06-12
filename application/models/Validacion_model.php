@@ -1519,6 +1519,10 @@ class Validacion_model extends CI_Model {
       	$this->db->set('comision', $this->input->post('comision'));
       	$this->db->set('celular', $this->input->post('celular'));
       	$this->db->set('referencia', $this->input->post('referencia'));
+      	
+      	$result = $this->db->query("SELECT c.ruta_foto FROM usuario c WHERE c.cedula = '".$this->input->post('cedula') ."'");
+		$cobrador = $result->row_array();
+		if($cobrador['ruta_foto'] != $archivo)
       	$this->db->set('ruta_foto', $archivo);
       	
       	$this->db->where('id_usuario', $this->input->post('id_usuario'));
