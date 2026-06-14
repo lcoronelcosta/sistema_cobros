@@ -2200,8 +2200,8 @@ class Validacion_model extends CI_Model {
 					$i++;
 				}
 				$detalleString = $detalleString.'- Valor: $'.$row['v_cuota'].'%0A';
-				$detalleString = $detalleString.'- Días atrasados : '.$diasMoraActual.'%0A';
-				$detalleString = $detalleString.'- Mora : $'.$saldoMora.'%0A';
+				$detalleString = ($row['aplica_calculo_por_cuota']) ? $detalleString.'- Días atrasados : '.$diasMoraActual.'%0A' : $detalleString;
+				$detalleString = ($row['aplica_calculo_por_cuota']) ? $detalleString.'- Mora : $'.$saldoMora.'%0A' : $detalleString;
 				$detalleString = $detalleString.'- Saldo: $'.($saldo+$saldoMora).'%0A';
 				$detalleString = $detalleString.'- Estado: '.$row['estado'].'%0A';
 			}
