@@ -262,11 +262,11 @@ date_default_timezone_set('America/Bogota');
     		    $chequeado="";
     		    if (check.checked)
     		    {
-    		    	$chequeado = "true";
+    		    	$chequeado = 1;
     		    }
     		    else
     		    {
-    		    	$chequeado = "false";
+    		    	$chequeado = 0;
     		    }
     		    
     		    document.getElementById("btn_guardar").style.display='none';

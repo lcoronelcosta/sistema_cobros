@@ -770,12 +770,19 @@ class Validacion_model extends CI_Model {
 			$fecha = $this->deleteAbono($id_abono, $id_cab_credito);
 		}
 
+		
+
 		//$this->load->helper('url');      	    
 		$id_det_credito = $this->input->post('id_det_credito');
 		$valor_abono = $this->input->post('valor_abono');
-		$liquidar = !is_null($this->input->post('liquidar')) ? $this->input->post('liquidar') : false;
+		$liquidar = !is_null($this->input->post('liquidar')) ? $this->input->post('liquidar') : 0;
+		log_message('info', $liquidar);
+		$liquidar = (!$liquidar) ? 0: 1;
 
-      	$this->db->set('totalpagado','totalpagado +'. (float)$valor_abono, FALSE);
+		log_message('info', 'saldo a liquidar IF 2 : '.$id_cab_credito.'--'.$valor_abono.'--'.$id_cobrador.'--'.$liquidar);
+		$this->db->query("CALL sp_aplicar_abono ($id_cab_credito, $valor_abono, $id_cobrador, $liquidar)");
+		//Actualiza el saldo a nivel de cabecera
+/*      	$this->db->set('totalpagado','totalpagado +'. (float)$valor_abono, FALSE);
       	$this->db->where('id_cab_credito', $id_cab_credito);
       	$this->db->update('cab_credito');
 
@@ -783,7 +790,7 @@ class Validacion_model extends CI_Model {
       	//****************************************************************
 		//Registrar en tabla abono 
 		//*/
-      	$dataabono = array(                          
+/*      	$dataabono = array(                          
          'id_cab_credito' => $id_cab_credito,
          'valor' => $valor_abono,
          'fecha' => $fecha,
@@ -905,7 +912,7 @@ class Validacion_model extends CI_Model {
 				}
 
 			}
-		}
+		}*/
 
 	}
 	
@@ -1887,7 +1894,7 @@ class Validacion_model extends CI_Model {
 				FROM det_credito AS dc
 				INNER JOIN cab_credito AS cc ON cc.id_cab_credito = dc.id_cab_credito
 				INNER JOIN formadepago AS fp ON fp.id_formadepago = cc.id_formadepago
-				AND dc.estado in ('pendiente', 'cancelado')
+				AND dc.estado in ('pendiente')
 				AND dc.n_cuota > 0
 				AND cc.id_cab_credito = ".$rowCabecera['id_cab_credito']."
 				ORDER BY dc.id_cab_credito DESC, dc.n_cuota DESC");
@@ -2187,7 +2194,7 @@ class Validacion_model extends CI_Model {
 			foreach ($result->result_array() as $row) {
 				$saldo = $row['v_cuota']-$row['abono'];
 				$moraActual = $row['valor_mora'];
-				$saldoMora = round($row['valor_mora']-$row['abono_mora'], 2);
+				$saldoMora = $row['valor_mora']-$row['abono_mora'];
 				$diasMoraActual = $row['dias_mora'];
 				$saldoTotal = $saldo+$saldoTotal+$saldoMora;
 				if($row['n_cuota'] == 0){
